@@ -1,0 +1,119 @@
+/*Scroll Section*/
+/* width */
+::-webkit-scrollbar {
+    width: 6px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+  background: #121212; 
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #5a5a5a; 
+  border-radius: 6px;
+}
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #898989; 
+}
+/*End of Scroll Section*/
+
+body {
+    margin: 0px;
+    font-family: Inter;
+
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: rgb(19,1,27);
+    background: linear-gradient(180deg, rgba(19,1,27,1) 0%, rgba(9,0,13,1) 100%);
+}
+
+.highest-performance-container {
+    border: 3px solid #2b1739;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+
+    width: 650px;
+    height: 350px;
+}
+.highest-performance-top-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.highest-performance-top-section p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #f3e6ff;
+
+    margin: 0px;
+}
+.highest-performance-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.highest-performance-close-container img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+.highest-performance-module-navigation-container {
+    box-sizing: border-box;
+    padding: 16px 12px;
+
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.highest-performance-module-navigation-container p {
+    display: inline-block;
+    position: relative;
+    padding-bottom: 6px;
+    margin: 0px 12px;
+
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+}
+.highest-performance-module-navigation-container p:nth-child(1)::after {
+    content: "";
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    height: 4px;
+
+    background-color: #ad1f48;
+    border-radius: 4px;
+}
+.highest-performance-data-container {
+    box-sizing: border-box;
+    padding: 0px 48px;
+
+    height: 250px;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill 1fr);
+    align-content: start;
+
+    row-gap: 6px;   
+
+    overflow-y: auto;
+}
+.highest-performance-data {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    border-bottom: 1px solid orange;
+}

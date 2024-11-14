@@ -1,0 +1,2114 @@
+/*Scroll Section*/
+/* width */
+::-webkit-scrollbar {
+    width: 6px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+  background: #121212; 
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #5a5a5a; 
+  border-radius: 6px;
+}
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #898989; 
+}
+/*End of Scroll Section*/
+
+body {
+    margin: 0px;
+    height: 100vh;
+
+    font-family: Inter;
+
+    display: grid;
+    grid-template-rows: max-content max-content 1fr;
+
+    background: linear-gradient(180deg, rgba(19,1,27,1) 0%, rgba(9,0,13,1) 100%);
+}
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: #0c0012;
+    color: #ffffff;
+
+    box-sizing: border-box;
+    padding: 0px 100px;
+}
+.header p {
+    cursor: pointer;
+}
+.subheader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 10px 75px;
+}
+.subheader-left-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    column-gap: 20px;
+}
+.professors-text-container > p,
+.students-text-container > p,
+.sections-text-container > p {
+    display: inline-block;
+    position: relative;
+    padding-bottom: 8px;
+    margin: 0px;
+
+    font-weight: 500;
+    color: white;
+}
+.professors-text-container > p::after,
+.students-text-container > p::after,
+.sections-text-container > p::after {
+    content: "";
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    height: 6px;
+
+    background-color: var(--after-background, #ad1f48);
+    border-radius: 4px;
+}
+.sections-text-container > p::after,
+.students-text-container > p::after {
+    background-color: var(--after-background, transparent);
+}
+.professors-text-container,
+.students-text-container,
+.sections-text-container {
+    cursor: pointer;
+}
+.add-entity-button {
+    padding: 4px 16px;
+    border: 2px solid #470c77;
+
+    align-content: center;
+
+    transition: border-radius 0.2s;
+}
+.add-entity-button p {
+    margin: 0px;
+    font-weight: 500;
+    color: #cacaca;
+}
+.add-entity-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+.professor-table {
+    display: grid;
+    grid-template-rows: max-content 1fr;
+
+    max-height: 100%;
+
+    overflow-y: auto;
+}
+.professor-table-header-container {
+    box-sizing: border-box;
+    padding: 0px 25px;
+}
+.professor-table-header {
+    border: 2px solid #2b1739;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+
+    height: max-content;
+    background-color: #160320;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+}
+.professor-table-header p {
+    color: #cacaca;
+    font-weight: 500;
+}
+
+.professor-table-data-container {
+    max-height: 100%;
+
+    align-self: start;
+
+    box-sizing: border-box;
+    padding: 6px 24px;
+
+    overflow-y: auto;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill 1fr);
+    row-gap: 6px;
+}
+.professor-table-data {
+    height: 35px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+
+    background-color: transparent;
+
+    border: 1px solid #240f36;
+}
+.professor-table-remove-professor-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.professor-table-remove-professor-container img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+.professor-table-data:hover {
+    background-color: #14011e;
+    cursor: pointer;
+}
+
+.professor-table-data p {
+    margin: 0px;
+
+    color: #cacaca;
+    font-weight: 200;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    overflow: hidden;
+}
+.student-table {
+    display: none;
+    grid-template-rows: max-content 1fr;
+
+    max-height: 100%;
+
+    overflow-y: auto;
+}
+.student-table-header-container {
+    box-sizing: border-box;
+    padding: 0px 25px;
+}
+.student-table-header {
+    border: 2px solid #2b1739;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+
+    height: max-content;
+    background-color: #160320;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+}
+.student-table-header p {
+    color: #cacaca;
+    font-weight: 500;
+}
+.student-table-data-container {
+    max-height: 100%;
+
+    align-self: start;
+
+    box-sizing: border-box;
+    padding: 6px 24px;
+
+    overflow-y: auto;
+
+    display: none;
+    grid-template-columns: repeat(auto-fill 1fr);
+    row-gap: 6px;
+}
+.student-table-data {
+    height: 35px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+
+    background-color: transparent;
+
+    border: 1px solid #240f36;
+}
+.student-table-data:hover {
+    background-color: #14011e;
+    cursor: pointer;
+}
+
+.student-table-data p {
+    margin: 0px;
+
+    color: #cacaca;
+    font-weight: 200;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    overflow: hidden;
+}
+.student-id-container,
+.student-name-container,
+.student-section-container {
+    width: 95%;
+    height: 20px;
+
+    overflow: hidden;
+}
+.class-section-table {
+    display: none;
+    grid-template-rows: max-content 1fr;
+
+    max-height: 100%;
+
+    overflow-y: auto;
+}
+.class-section-table-header-container {
+    box-sizing: border-box;
+    padding: 0px 25px;
+}
+.class-section-table-header {
+    border: 2px solid #2b1739;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+
+    height: max-content;
+    background-color: #160320;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;     
+    justify-items: center;
+    align-items: center;
+}
+.class-section-table-header p {
+    color: #cacaca;
+    font-weight: 500;
+}
+.class-section-table-data-container {
+    max-height: 100%;
+
+    align-self: start;
+
+    box-sizing: border-box;
+    padding: 6px 24px;
+
+    overflow-y: auto;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill 1fr);
+    row-gap: 6px;
+}
+.class-section-table-data {
+    height: 35px;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+
+    background-color: transparent;
+
+    border: 1px solid #240f36;
+}
+.class-section-table-data:hover {
+    background-color: #14011e;
+    cursor: pointer;
+}
+
+.class-section-table-data p {
+    margin: 0px;
+
+    color: #cacaca;
+    font-weight: 200;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    overflow: hidden;
+}
+.class-section-name-container,
+.class-section-slot-container,
+.class-section-assigned-to-container {
+    max-width: 95%;
+    height: 20px;
+
+    overflow: hidden;
+
+    pointer-events: none;;
+}
+.professor-name-container,
+.professor-username-container,
+.professor-password-container {
+    width: 95%;
+    height: 20px;
+
+    overflow: hidden;
+
+    pointer-events: none;
+}
+
+.professor-handled-section-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.professor-handled-section-container {
+    width: 95%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: row;
+    column-gap: 6px;
+    justify-content:space-evenly;
+
+    overflow-y: auto;
+
+    pointer-events: none;
+}
+.handled-section {
+    background-color: transparent;
+    border: 2px solid #310d51;
+
+    box-sizing: border-box;
+    padding: 2px 4px;
+
+    align-self: center;
+
+    pointer-events: none;
+}
+.handled-section:hover {
+    cursor: default;
+}
+.handled-section p {
+    font-weight: 200;
+    font-size: 12px;
+    color: #cacaca;
+
+    margin: 0px;
+
+    text-align: center;
+}
+.admin-bottom-tip-container p {
+    color: #3a3a3a;
+    font-weight: 500;
+
+    margin: 0px;
+    margin-bottom: 8px;
+
+    text-align: center;
+}
+@media screen and (max-width: 505px) {
+    .header h1 {
+        font-size: 24px;
+    }
+    .header p {
+        font-size: 12px;
+    }
+    .professor-text-container > p {
+        font-size: 14px;
+        padding-bottom: 4px;
+        content: "khalid";
+    } 
+    .add-entity-button {
+        font-size: 14px;
+    } 
+    .professor-text-container > p::after {
+        height: 3px;
+    }
+}
+/*Start of Add Professor Modal*/
+.add-professor-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 1;
+}
+.add-professor-modal {
+    height: max-content;
+    width: 650px;
+
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+}
+.add-professor-modal-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+.add-professor-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.add-professor-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.add-professor-modal-close-container:hover {
+    cursor: pointer;
+}
+.add-professor-modal-close-container img { 
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+.add-professor-modal-credential-container {
+    box-sizing: border-box;
+    padding: 12px 24px;
+}
+.add-professor-modal-name-container,
+.add-professor-modal-email-container,
+.add-professor-modal-password-container {
+    display: flex;
+
+    padding: 4px 0px;
+}
+.add-professor-modal-name-container div,
+.add-professor-modal-email-container div,
+.add-professor-modal-password-container div {
+    width: 110px;
+}
+.add-professor-modal-name-container div > p,
+.add-professor-modal-email-container div > p,
+.add-professor-modal-password-container div > p {
+    font-size: 16px;
+    font-weight: 200;
+
+    color: #ffffff;
+
+    margin: 0px;
+}
+.add-professor-modal-name-container input,
+.add-professor-modal-email-container input,
+.add-professor-modal-password-container input {
+    border: none;
+    border-bottom: 1px solid #9a9a9a;
+
+    background-color: transparent;
+    color: #fe8f01;
+
+    font-size: 14px;
+
+    flex: 1;
+}
+/* .add-professor-modal-password-container input {
+    cursor: not-allowed;
+} */
+.add-professor-modal-name-container input::placeholder,
+.add-professor-modal-email-container input::placeholder,
+.add-professor-modal-password-container input::placeholder {
+    color: #873510;
+}
+.add-professor-modal-name-container input:focus,
+.add-professor-modal-email-container input:focus,
+.add-professor-modal-password-container input:focus {
+    outline: none;
+}
+.add-professor-modal-section-outer-container {
+    box-sizing: border-box;
+    padding: 16px 72px;
+
+    display: grid;
+    grid-template-rows: max-content max-content;
+    row-gap: 10px;
+}
+.add-professor-modal-section-inner-container {
+    display: flex;
+    flex-direction: row;
+    column-gap: 6px;
+    
+    overflow-y: auto;
+}
+.add-professor-modal-section-inner-container::-webkit-scrollbar {
+    height: 6px;
+}
+.add-professor-modal-section {
+    background-color: transparent;
+    border: 1px solid #310d51;
+
+    box-sizing: border-box;
+    padding: 2px 8px;
+
+    margin-bottom: 6px;
+}
+.add-professor-modal-section p {
+    margin: 0px;
+
+    font-weight: 200;
+    font-size: 14px;
+    color: #cacaca;
+}
+.add-professor-modal-assign-remove-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    column-gap: 15px;
+}
+.add-professor-modal-remove-section-button,
+.add-professor-modal-assign-section-button {
+    padding: 4px 16px;
+    border: 1px solid #470c77; 
+}
+.add-professor-modal-remove-section-button p,
+.add-professor-modal-assign-section-button p {
+    margin: 0px;
+
+    font-size: 14px;
+    font-weight: 400;
+    color: #cacaca;
+}
+.add-professor-modal-remove-section-button:hover,
+.add-professor-modal-assign-section-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+}
+.add-professor-modal-confirm-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+
+    box-sizing: border-box;
+    padding: 8px 12px;
+}
+.add-professor-modal-confirm-button {
+    background-color: #0c0012;
+    
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    margin: 0px;
+    
+    font-size: 16px;
+    font-weight: 400;
+    color: #cacaca;
+
+    transition: border-radius 0.2s;
+}
+.add-professor-modal-confirm-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+/*End of Add Professor Modal*/
+
+/*Start of Add Section Modal*/
+.add-section-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 2;
+}
+.add-section-modal {
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+.add-section-modal-top-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    column-gap: 100px;
+
+    margin-bottom: 20px;
+}
+.add-section-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.add-section-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.add-section-modal-close-container:hover {
+    cursor: pointer;
+}
+.add-section-modal-close-container img {
+    width: 100%; 
+    height: 100%;
+
+    object-fit: contain;
+}
+.add-section-modal-middle-section {
+    display: flex;
+    margin-bottom: 15px;
+}
+.add-section-modal-section-container p {
+    font-size: 16px;
+    font-weight: 200;
+
+    color: #cacaca;
+
+    margin: 0px;
+    margin-right: 10px;
+}
+.add-section-modal-middle-section input {
+    border: none;
+    border-bottom: 1px solid #9a9a9a;
+
+    background-color: transparent;
+    color: #fe8f01;
+
+    font-size: 14px;
+
+    flex: 1;
+}
+.add-section-modal-middle-section input:focus {
+    outline: none;
+}
+.add-section-modal-middle-section input::placeholder {
+    color: #873510;
+}
+.add-section-modal-bottom-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+.add-section-modal-confirm-button {
+    background-color: #0c0012;
+    
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    font-size: 16px;
+    width: max-content;
+
+    transition: border-radius 0.2s;
+
+    font-weight: 500;
+    color: #cacaca;
+}
+.add-section-modal-confirm-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+/*End of Add Section Modal*/
+
+/*Start of Delete Section Modal*/
+.delete-section-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 2;
+}
+.delete-section-modal {
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+
+    width: max-content;
+    height: max-content;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+
+.delete-section-modal-top-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    column-gap: 125px;
+
+    margin-bottom: 20px;
+}
+.delete-section-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.delete-section-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.delete-section-modal-close-container:hover {
+    cursor: pointer;
+}
+.delete-section-modal-close-container img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+.delete-section-modal-middle-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    column-gap: 10px;
+
+    margin-bottom: 15px;
+}
+.delete-section-input-section-name p {
+    margin: 0px;
+    color: #cacaca;
+    font-weight: 200;
+}
+.delete-section-modal-middle-section input {
+    border: none;
+    border-bottom: 1px solid #9a9a9a;
+
+    background-color: transparent;
+    color: #fe8f01;
+
+    font-size: 14px;
+
+    flex: 1;
+}
+.delete-section-modal-middle-section input:focus {
+    outline: none;
+}
+.delete-section-modal-middle-section input::placeholder {
+    color: #873510;
+}
+.delete-section-modal-bottom-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+.delete-section-modal-confirm-button {
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    background-color: #120119;
+
+    font-size: 16px;
+
+    transition: border-radius 0.2s;
+
+    font-weight: 400;
+    color: #cacaca;
+}
+.delete-section-modal-confirm-button:hover {
+    cursor: pointer; 
+
+    background-color: #1b0229;
+
+    border-radius: 6px;
+}
+/*End of Delete Section Modal*/
+
+/*Start of Assign Section Modal*/
+.assign-section-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 1;
+}
+.assign-section-modal {
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+.assign-section-modal-top-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    column-gap: 100px;
+
+    margin-bottom: 20px;
+}
+.assign-section-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.assign-section-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.assign-section-modal-close-container:hover {
+    cursor: pointer;
+}
+.assign-section-modal-close-container img {
+    width: 100%; 
+    height: 100%;
+
+    object-fit: contain;
+}
+.assign-section-modal-middle-section {
+    display: flex;
+    margin-bottom: 15px;
+}
+.assign-section-modal-section-container p {
+    font-size: 16px;
+    font-weight: 200;
+
+    color: #cacaca;
+
+    margin: 0px;
+    margin-right: 10px;
+}
+.assign-section-modal-middle-section input {
+    border: none;
+    border-bottom: 1px solid #9a9a9a;
+
+    background-color: transparent;
+    color: #fe8f01;
+
+    font-size: 14px;
+
+    flex: 1;
+}
+.assign-section-modal-middle-section input:focus {
+    outline: none;
+}
+.assign-section-modal-middle-section input::placeholder {
+    color: #873510;;
+}
+.assign-section-modal-bottom-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+.assign-section-modal-confirm-button {
+    background-color: #0c0012;
+
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    font-size: 16px;
+    width: max-content;
+
+    margin: 0px;
+    font-weight: 500;
+    color: #cacaca;
+
+    transition: border-radius 0.2s;
+}
+.assign-section-modal-confirm-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+/*End of Assign Section Modal*/
+
+/*Start of Remove Section Modal*/
+.remove-section-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 2;
+}
+.remove-section-modal {
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+
+    width: max-content;
+    height: max-content;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+
+.remove-section-modal-top-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    column-gap: 125px;
+
+    margin-bottom: 20px;
+}
+.remove-section-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.remove-section-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.remove-section-modal-close-container:hover {
+    cursor: pointer;
+}
+.remove-section-modal-close-container img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+.remove-section-modal-middle-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    column-gap: 10px;
+
+    margin-bottom: 15px;
+}
+.remove-section-input-section-name p {
+    margin: 0px;
+    color: #cacaca;
+    font-weight: 200;
+}
+.remove-section-modal-middle-section input {
+    border: none;
+    border-bottom: 1px solid #9a9a9a;
+
+    background-color: transparent;
+    color: #fe8f01;
+
+    font-size: 14px;
+
+    flex: 1;
+}
+.remove-section-modal-middle-section input:focus {
+    outline: none;
+}
+.remove-section-modal-middle-section input::placeholder {
+    color: #873510;
+}
+.remove-section-modal-bottom-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+.remove-section-modal-confirm-button {
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    background-color: #120119;
+
+    font-size: 16px;
+
+    transition: border-radius 0.2s;
+
+    font-weight: 400;
+    color: #cacaca;
+}
+.remove-section-modal-confirm-button:hover {
+    cursor: pointer; 
+
+    background-color: #1b0229;
+
+    border-radius: 6px;
+}
+/*End of Remove Section Modal*/
+
+/*Start of Edit Professor Modal*/
+.edit-professor-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 1;
+}
+.edit-professor-modal {
+    height: max-content;
+    width: 650px;
+
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+}
+.edit-professor-modal-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+.edit-professor-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.edit-professor-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.edit-professor-modal-close-container:hover {
+    cursor: pointer;
+}
+.edit-professor-modal-close-container img { 
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+.edit-professor-modal-section-outer-container {
+    box-sizing: border-box;
+    padding: 16px 72px;
+
+    display: grid;
+    grid-template-rows: max-content max-content;
+    row-gap: 10px;
+}
+.edit-professor-modal-section-inner-container {
+    display: flex;
+    flex-direction: row;
+    column-gap: 6px;
+    
+    overflow-y: auto;
+}
+.edit-professor-modal-section-inner-container::-webkit-scrollbar {
+    height: 6px;
+}
+.edit-professor-modal-section {
+    background-color: transparent;
+    border: 1px solid #310d51;
+
+    box-sizing: border-box;
+    padding: 2px 8px;
+
+    margin-bottom: 6px;
+}
+.edit-professor-modal-section p {
+    margin: 0px;
+
+    font-weight: 200;
+    font-size: 14px;
+    color: #cacaca;
+}
+.edit-professor-modal-section:hover {
+    cursor: pointer;
+}
+.edit-professor-modal-add-delete-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    column-gap: 15px;
+}
+.edit-professor-modal-add-section-button,
+.edit-professor-modal-delete-section-button {
+    background: #0c0012;
+
+    padding: 4px 16px;
+    border: 1px solid #470c77; 
+
+    align-content: center;
+
+    font-size: 14px;
+    font-weight: 500;
+    color: #cacaca;
+}
+.edit-professor-modal-add-section-button:hover,
+.edit-professor-modal-delete-section-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+}
+.edit-professor-modal-delete-confirm-button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+
+    column-gap: 15px;
+}
+.edit-professor-modal-delete-button,
+.edit-professor-modal-confirm-button {
+    background-color: #0c0012;
+
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+   
+    font-size: 16px;
+    font-weight: 400;
+    color: #cacaca;
+
+    transition: border-radius 0.2s;
+    transition: background-color 0.2s;
+}
+.edit-professor-modal-delete-button {
+    border: 2px solid #ef224b;
+}
+.edit-professor-modal-confirm-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+.edit-professor-modal-delete-button:hover {
+    cursor: pointer;
+    background-color: #ff00332c;
+    border-radius: 6px;
+}
+/*End of Edit Professor Modal*/
+
+/*Start of Confirm Deletion Modal*/
+.confirm-deletion-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 2;
+}
+.confirm-deletion-modal {
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+
+    width: 325px;
+}
+.confirm-deletion-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+.confirm-deletion-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+    
+    color: #cacaca;
+    
+    margin: 0px;
+}
+.confirm-deletion-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.confirm-deletion-modal-close-container:hover {
+    cursor: pointer;
+}
+.confirm-deletion-modal-close-container img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+.confirm-deletion-modal-message {
+    box-sizing: border-box;
+    padding: 12px 24px;
+}
+.confirm-deletion-modal-message p {
+    margin: 0px;
+
+    font-size: 14px;
+    font-weight: 200;
+    color: #cacaca;
+
+    text-align: center;
+}
+.confirm-deletion-modal-confirm-cancel-button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+
+    column-gap: 15px;
+}
+.confirm-deletion-modal-cancel-button,
+.confirm-deletion-modal-confirm-button {
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    transition: border-radius 0.2s;
+}
+.confirm-deletion-modal-cancel-button:hover,
+.confirm-deletion-modal-confirm-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+.confirm-deletion-modal-confirm-button p,
+.confirm-deletion-modal-cancel-button p {
+    margin: 0px;
+    
+    font-size: 16px;
+    font-weight: 400;
+    color: #cacaca;
+}
+/*End of Confirm Deletion Modal*/
+
+/*Start of Add Student Modal*/
+.add-student-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 1;
+}
+.add-student-modal {
+    height: max-content;
+    width: 650px;
+
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+}
+.add-student-modal-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+.add-student-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.add-student-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.add-student-modal-close-container:hover {
+    cursor: pointer;
+}
+.add-student-modal-close-container img { 
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+.add-student-modal-credential-container {
+    box-sizing: border-box;
+    padding: 12px 24px;
+}
+.add-student-modal-name-container,
+.add-student-modal-email-container,
+.add-student-modal-id-number-container,
+.add-student-modal-section-container,
+.add-student-modal-password-container {
+    display: flex;
+
+    padding: 4px 0px;
+}
+.add-student-modal-name-container div,
+.add-student-modal-email-container div,
+.add-student-modal-id-number-container div,
+.add-student-modal-section-container div,
+.add-student-modal-password-container div {
+    width: 110px;
+}
+.add-student-modal-name-container div > p,
+.add-student-modal-email-container div > p,
+.add-student-modal-id-number-container div > p,
+.add-student-modal-section-container div > p,
+.add-student-modal-password-container div > p {
+    font-size: 16px;
+    font-weight: 200;
+
+    color: #ffffff;
+
+    margin: 0px;
+}
+.add-student-modal-name-container input,
+.add-student-modal-email-container input,
+.add-student-modal-id-number-container input,
+.add-student-modal-section-container input,
+.add-student-modal-password-container input {
+    border: none;
+    border-bottom: 1px solid #9a9a9a;
+
+    background-color: transparent;
+    color: #fe8f01;
+
+    font-size: 14px;
+
+    flex: 1;
+}
+.add-student-modal-name-container input::placeholder,
+.add-student-modal-email-container input::placeholder,
+.add-student-modal-id-number-container input::placeholder,
+.add-student-modal-section-container input::placeholder,
+.add-student-modal-password-container input::placeholder {
+    color: #873510;
+}
+.add-student-modal-name-container input:focus,
+.add-student-modal-email-container input:focus,
+.add-student-modal-id-number-container input:focus,
+.add-student-modal-section-container input:focus,
+.add-student-modal-password-container input:focus {
+    outline: none;
+}
+.add-student-modal-add-delete-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    column-gap: 15px;
+}
+.add-student-modal-add-section-button,
+.add-student-modal-delete-section-button {
+    padding: 4px 16px;
+    border: 1px solid #470c77; 
+
+    align-content: center;
+}
+.add-student-modal-add-section-button p,
+.add-student-modal-delete-section-button p {
+    margin: 0px;
+
+    font-size: 14px;
+    font-weight: 500;
+    color: #cacaca;
+}
+.add-student-modal-add-section-button:hover,
+.add-student-modal-delete-section-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+}
+.add-student-modal-delete-confirm-button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+
+    column-gap: 15px;
+}
+
+.add-student-modal-confirm-button {
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    transition: border-radius 0.2s;
+    transition: background-color 0.2s;
+}
+.add-student-modal-confirm-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+.add-student-modal-confirm-button p {
+    margin: 0px;
+    
+    font-size: 16px;
+    font-weight: 400;
+    color: #cacaca;
+}
+/*End of Add Student Modal*/
+
+/*Start of Edit Student Modal*/
+.edit-student-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 1;
+}
+.edit-student-modal {
+    height: max-content;
+    width: 650px;
+
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+}
+.edit-student-modal-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+.edit-student-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.edit-student-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.edit-student-modal-close-container:hover {
+    cursor: pointer;
+}
+.edit-student-modal-close-container img { 
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+.edit-student-modal-credential-container {
+    box-sizing: border-box;
+    padding: 12px 24px;
+}
+.edit-student-modal-name-container,
+.edit-student-modal-email-container,
+.edit-student-modal-id-number-container,
+.edit-student-modal-section-container,
+.edit-student-modal-password-container {
+    display: flex;
+
+    padding: 4px 0px;
+}
+.edit-student-modal-name-container div,
+.edit-student-modal-email-container div,
+.edit-student-modal-id-number-container div,
+.edit-student-modal-section-container div,
+.edit-student-modal-password-container div {
+    width: 110px;
+}
+.edit-student-modal-name-container div > p,
+.edit-student-modal-email-container div > p,
+.edit-student-modal-id-number-container div > p,
+.edit-student-modal-section-container div > p,
+.edit-student-modal-password-container div > p {
+    font-size: 16px;
+    font-weight: 200;
+
+    color: #ffffff;
+
+    margin: 0px;
+}
+.edit-student-modal-name-container input,
+.edit-student-modal-email-container input,
+.edit-student-modal-id-number-container input,
+.edit-student-modal-section-container input,
+.edit-student-modal-password-container input {
+    border: none;
+    border-bottom: 1px solid #9a9a9a;
+
+    background-color: transparent;
+    color: #fe8f01;
+
+    font-size: 14px;
+
+    flex: 1;
+}
+.edit-student-modal-name-container input::placeholder,
+.edit-student-modal-email-container input::placeholder,
+.edit-student-modal-id-number-container input::placeholder,
+.edit-student-modal-section-container input::placeholder,
+.edit-student-modal-password-container input::placeholder {
+    color: #873510;
+}
+.edit-student-modal-name-container input:focus,
+.edit-student-modal-email-container input:focus,
+.edit-student-modal-id-number-container input:focus,
+.edit-student-modal-section-container input:focus,
+.edit-student-modal-password-container input:focus {
+    outline: none;
+}
+.edit-student-modal-add-delete-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    column-gap: 15px;
+}
+.edit-student-modal-add-section-button,
+.edit-student-modal-delete-section-button {
+    padding: 4px 16px;
+    border: 1px solid #470c77; 
+
+    align-content: center;
+}
+.edit-student-modal-add-section-button p,
+.edit-student-modal-delete-section-button p {
+    margin: 0px;
+
+    font-size: 14px;
+    font-weight: 500;
+    color: #cacaca;
+}
+.edit-student-modal-add-section-button:hover,
+.edit-student-modal-delete-section-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+}
+.edit-student-modal-delete-confirm-button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+
+    column-gap: 15px;
+}
+.edit-student-modal-delete-button,
+.edit-student-modal-confirm-button {
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    transition: border-radius 0.2s;
+    transition: background-color 0.2s;
+}
+.edit-student-modal-delete-button {
+    border: 2px solid #ef224b;
+}
+.edit-student-modal-confirm-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+.edit-student-modal-delete-button:hover {
+    cursor: pointer;
+    background-color: #ff00332c;
+    border-radius: 6px;
+}
+.edit-student-modal-delete-button p,
+.edit-student-modal-confirm-button p {
+    margin: 0px;
+    
+    font-size: 16px;
+    font-weight: 400;
+    color: #cacaca;
+}
+/*End of Edit Student Modal*/
+
+/*Start of Add Class Section Modal*/
+.add-class-section-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 2;
+}
+.add-class-section-modal {
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+
+    width: 325px;
+}
+.add-class-section-modal-top-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 4px 16px;
+}
+.add-class-section-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.add-class-section-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.add-class-section-modal-close-container:hover {
+    cursor: pointer;
+}
+.add-class-section-modal-close-container img {
+    width: 100%; 
+    height: 100%;
+
+    object-fit: contain;
+}
+.add-class-section-modal-middle-section {
+    display: flex;
+    box-sizing: border-box;
+    padding: 12px 24px;
+}
+.add-class-section-modal-section-container p {
+    font-size: 16px;
+    font-weight: 200;
+
+    color: #cacaca;
+
+    margin: 0px;
+    margin-right: 10px;
+}
+.add-class-section-modal-middle-section input {
+    border: none;
+    border-bottom: 1px solid #9a9a9a;
+
+    background-color: transparent;
+    color: #fe8f01;
+
+    font-size: 14px;
+
+    flex: 1;
+}
+.add-class-section-modal-middle-section input:focus {
+    outline: none;
+}
+.add-class-section-modal-middle-section input::placeholder {
+    color: #873510;
+}
+.add-class-section-modal-bottom-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+
+    box-sizing: border-box;
+    padding: 4px 16px;
+}
+.add-class-section-modal-bottom-section button{
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    font-size: 16px;
+
+    transition: border-radius 0.2s;
+    background-color: transparent;
+    margin: 0px;
+    font-weight: 400;
+    color: #cacaca;
+}
+.add-class-section-modal-bottom-section button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+/*End of Add Class Section Modal*/
+
+/*Start of Edit Class Section Modal*/
+.edit-class-section-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 1;
+}
+.edit-class-section-modal {
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+
+    width: 650px;
+    height: 300px;
+
+    display: grid;
+    grid-template-rows: max-content max-content 1fr;
+}
+.edit-class-section-top-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 4px 16px;
+}
+.edit-class-section-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.edit-class-section-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.edit-class-section-close-container:hover {
+    cursor: pointer;
+}
+.edit-class-section-close-container img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+.edit-class-section-modal-table-description {
+    box-sizing: border-box;
+    padding: 0px 16px;
+
+    justify-items: start;
+}
+.edit-class-section-modal-table-description p {
+    margin: 0px;
+    font-size: 14px;
+    font-weight: 100;
+    color: #cacaca;
+}
+.edit-class-section-modal-table-data-container {
+    box-sizing: border-box;
+    padding: 10px 32px;
+    max-height: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill 1fr);
+    align-content: start;
+
+    row-gap: 10px;   
+
+    overflow-y: auto;
+}
+.edit-class-section-modal-table-data {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 4px 16px;
+
+    border-bottom: 1px solid #240f36;
+}
+.edit-class-section-modal-table-data-student-name,
+.edit-class-section-modal-table-data-student-id {
+    width: 95%;
+    height: 20px;
+    
+    overflow: hidden;
+}
+.edit-class-section-modal-table-data-student-name p,
+.edit-class-section-modal-table-data-student-id p {
+    margin: 0px;
+    color: #cacaca;
+    font-weight: 200;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.edit-class-section-modal-table-data:hover {
+    background-color: #14011e;
+    cursor: pointer;
+}
+.edit-class-section-modal-delete-rename-button-container {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 4px 16px;
+
+    column-gap: 10px;
+}
+.edit-class-section-modal-delete-rename-button-container button {
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    background: transparent;
+
+    margin: 0px;
+    
+    font-size: 16px;
+    font-weight: 400;
+    color: #cacaca; 
+
+    transition: border-radius 0.2s;
+    transition: background-color 0.2s;
+}
+.edit-class-section-modal-delete-rename-button-container button:nth-child(1) {
+    border: 2px solid #ef224b;
+}
+.edit-class-section-modal-delete-rename-button-container button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+.edit-class-section-modal-delete-rename-button-container button:nth-child(1):hover {
+    cursor: pointer;
+    background-color: #ff00332c;
+    border-radius: 6px;
+}
+/*End of Edit Class Section Modal*/
+
+.transparent-background {
+    background-color: transparent;
+}
+.rename-section-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 2;
+}
+.rename-section-modal {
+    border: 2px solid #240042;
+
+    background-color: #0c0012;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+.rename-section-modal-top-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    column-gap: 100px;
+
+    margin-bottom: 20px;
+}
+.rename-section-modal-title p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #cacaca;
+
+    margin: 0px;
+}
+.rename-section-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.rename-section-modal-close-container:hover {
+    cursor: pointer;
+}
+.rename-section-modal-close-container img {
+    width: 100%; 
+    height: 100%;
+
+    object-fit: contain;
+}
+.rename-section-modal-middle-section {
+    display: flex;
+    margin-bottom: 15px;
+}
+.rename-section-modal-section-container p {
+    font-size: 16px;
+    font-weight: 200;
+
+    color: #cacaca;
+
+    margin: 0px;
+    margin-right: 10px;
+}
+.rename-section-modal-middle-section input {
+    border: none;
+    border-bottom: 1px solid #9a9a9a;
+
+    background-color: transparent;
+    color: #fe8f01;
+
+    font-size: 14px;
+
+    flex: 1;
+}
+.rename-section-modal-middle-section input:focus {
+    outline: none;
+}
+.rename-section-modal-middle-section input::placeholder {
+    color: #873510;
+}
+.rename-section-modal-bottom-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+.rename-section-modal-confirm-button {
+    padding: 4px 16px;
+    border: 2px solid #470c77; 
+
+    font-size: 16px;
+    width: max-content;
+
+    transition: border-radius 0.2s;
+}
+.rename-section-modal-confirm-button:hover {
+    cursor: pointer; 
+    background-color: #1b0229;
+    border-radius: 6px;
+}
+.rename-section-modal-confirm-button p {
+    margin: 0px;
+    font-weight: 500;
+    color: #cacaca;
+}

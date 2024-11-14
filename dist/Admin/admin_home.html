@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Home</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="admin_home.css">
+    <script src="../index.bundle.js" defer></script>
+</head>
+<body>
+    <div class="header">
+        <h1><span style="color: #ff6a00;">Tutoriowl|</span> Admin</h1>
+        <p>Logout</p>
+    </div>
+    <div class="subheader">
+        <div class="subheader-left-section">
+            <div class="professors-text-container"><p>Professors</p></div>
+            <div class="students-text-container"><p>Students</p></div>
+            <div class="sections-text-container"><p>Sections</p></div>
+        </div>
+        <div class="add-entity-button"><p>Add</p></div>
+    </div>
+    <div class="professor-table">
+        <div class="professor-table-header-container">
+            <div class="professor-table-header">
+                <div><p>Name</p></div>
+                <div><p>Handled Sections</p></div>
+            </div>
+        </div>
+        <div class="professor-table-data-container">
+            <!-- <div class="professor-table-data">
+                <div class="professor-name-container">
+                    <p>Edenille Ann Santos</p>
+                </div>
+                <div class="professor-handled-section-container">
+                    <div class="handled-section">
+                        <p>TN192</p>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </div>
+    <div class="student-table">
+        <div class="student-table-header-container">
+            <div class="student-table-header">
+                <div><p>ID Number</p></div>
+                <div><p>Name</p></div>
+                <div><p>Section</p></div>
+            </div>
+        </div>
+        <div class="student-table-data-container">
+            <div class="student-table-data">
+                <div class="student-id-container">
+                    <p>202110233</p>
+                </div>
+                <div class="student-name-container">
+                    <p>Khandaker, Khalid Uzzaman T.</p>
+                </div>
+                <div class="student-section-container">
+                    <p>TN21</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="class-section-table">
+        <div class="class-section-table-header-container">
+            <div class="class-section-table-header">
+                <div><p>Section Name</p></div>
+                <div><p>Available Slot</p></div>
+                <div><p>Assigned To</p></div>
+            </div>
+        </div>
+        <div class="class-section-table-data-container">
+            <!-- Class section table data  -->
+        </div>
+    </div>
+    <div class="admin-bottom-tip-container">
+        <p>
+            You can modify a particular table data by selecting their row.
+        </p>
+    </div>
+    <div class="add-professor-modal-container">
+        <div class="add-professor-modal">
+            <form class="add-professor-form"> 
+                <div class="add-professor-modal-header">
+                    <div class="add-professor-modal-title">
+                        <p>Adding Professor Account</p>
+                    </div>
+                    <div class="add-professor-modal-close-container">
+                        <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                    </div>
+                </div>
+                <div class="add-professor-modal-credential-container">
+                    <div class="add-professor-modal-name-container">
+                        <div><p>Name:</p></div><input type="text" placeholder="Professor Name" name="professor_name" autocomplete="off">
+                    </div>
+                    <div class="add-professor-modal-email-container">
+                        <div><p>Email:</p></div><input type="text" placeholder="Professor Email" name="professor_email" autocomplete="off">
+                    </div>
+                    <div class="add-professor-modal-password-container">
+                        <div><p>Password:</p></div><input type="password" placeholder="Professor Password" name="professor_password" autocomplete="off"> 
+                    </div>
+                </div>
+                <div class="add-professor-modal-section-outer-container">
+                    <div class="add-professor-modal-section-inner-container">
+                        <!-- <div class="add-professor-modal-section">
+                            <p>TN41</p>
+                        </div> -->
+                    </div>
+                    <div class="add-professor-modal-assign-remove-button-container">
+                        <div class="add-professor-modal-assign-section-button">
+                            <p>Assign Section</p>
+                        </div>
+                        <div class="add-professor-modal-remove-section-button">
+                            <p>Remove Section</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-professor-modal-confirm-container">
+                    <button class="add-professor-modal-confirm-button" type="submit">
+                        Confirm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="add-section-modal-container">
+        <form class="add-section-form">
+            <div class="add-section-modal">
+                <form class="add-section-form">
+                    <div class="add-section-modal-top-section">
+                        <div class="add-section-modal-title">
+                            <p>Adding Section</p>
+                        </div>
+                        <div class="add-section-modal-close-container">
+                            <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                        </div>
+                    </div>
+                    <div class="add-section-modal-middle-section">
+                        <div class="add-section-modal-section-container">
+                            <p>Section:</p>
+                        </div>
+                        <input type="text" placeholder="Section to Add" name="section_to_add">
+                    </div>
+                    <div class="add-section-modal-bottom-section">
+                        <button type="submit" class="add-section-modal-confirm-button">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </form>
+    </div>
+    <div class="delete-section-modal-container">
+        <form class="delete-section-form">
+            <div class="delete-section-modal">
+                <div class="delete-section-modal-top-section">
+                    <div class="delete-section-modal-title">
+                        <p>Deleting Section</p>
+                    </div>
+                    <div class="delete-section-modal-close-container">
+                        <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                    </div>
+                </div>
+                <div class="delete-section-modal-middle-section">
+                    <div class="delete-section-input-section-name">
+                        <p>Section: </p>
+                    </div>
+                    <input type="text" placeholder="Section to Delete" name="section_to_be_deleted">
+                </div>
+                <div class="delete-section-modal-bottom-section">
+                    <button type="submit" class="delete-section-modal-confirm-button">Confirm</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="assign-section-modal-container">
+        <form class="assign-section-form">
+            <div class="assign-section-modal">
+                <div class="assign-section-modal-top-section">
+                    <div class="assign-section-modal-title">
+                        <p>Assigning Section</p>
+                    </div>
+                    <div class="assign-section-modal-close-container">
+                        <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                    </div>
+                </div>
+                <div class="assign-section-modal-middle-section">
+                    <div class="assign-section-modal-section-container">
+                        <p>Section:</p>
+                    </div>
+                    <input type="text" placeholder="Section to be Assigned" name="section_to_be_assigned" autocomplete="off">
+                </div>
+                <div class="assign-section-modal-bottom-section">
+                    <button class="assign-section-modal-confirm-button" type="submit">Assign Section</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="remove-section-modal-container">
+        <form class="remove-section-form">
+            <div class="remove-section-modal">  
+                <div class="remove-section-modal-top-section">
+                    <div class="remove-section-modal-title">
+                        <p>Removing Section</p>
+                    </div>
+                    <div class="remove-section-modal-close-container">
+                        <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                    </div>
+                </div>
+                <div class="remove-section-modal-middle-section">
+                    <div class="remove-section-input-section-name">
+                        <p>Section: </p>
+                    </div>
+                    <input type="text" placeholder="Section to Remove" name="section_to_remove" autocomplete="off">
+                </div>
+                <div class="remove-section-modal-bottom-section">
+                    <button class="remove-section-modal-confirm-button" type="submit">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="edit-professor-modal-container">
+        <form class="edit-professor-form">
+            <div class="edit-professor-modal">
+                <div class="edit-professor-modal-header">
+                    <div class="edit-professor-modal-title">
+                        <p>Editing Professor Account</p>
+                    </div>
+                    <div class="edit-professor-modal-close-container">
+                        <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                    </div>
+                </div>
+                <div class="edit-professor-modal-section-outer-container">
+                    <div class="edit-professor-modal-section-inner-container">
+                        <!-- <div class="edit-professor-modal-section">
+                            <p>TN41</p>
+                        </div> -->
+                    </div>
+                    <div class="edit-professor-modal-add-delete-container">
+                        <button class="edit-professor-modal-add-section-button" type="button">Add Section</button>
+                        <button class="edit-professor-modal-delete-section-button" type="button">Delete Section</button>
+                    </div>
+                </div>
+                <div class="edit-professor-modal-delete-confirm-button-container">
+                    <button class="edit-professor-modal-delete-button" type="button">Delete</button>
+                    <button class="edit-professor-modal-confirm-button" type="button">Confirm</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="confirm-deletion-modal-container">
+        <div class="confirm-deletion-modal">
+            <div class="confirm-deletion-modal-header">
+                <div class="confirm-deletion-modal-title">
+                    <p>Removing Professor</p>
+                </div>
+                <div class="confirm-deletion-modal-close-container">
+                    <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                </div>
+            </div>
+            <div class="confirm-deletion-modal-message">
+                <p>Are you sure you want to remove this professor?</p>
+            </div>
+            <div class="confirm-deletion-modal-confirm-cancel-button-container">
+                <div class="confirm-deletion-modal-cancel-button">
+                    <p>Cancel</p>
+                </div>
+                <div class="confirm-deletion-modal-confirm-button">
+                    <p>Confirm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="add-student-modal-container">
+        <div class="add-student-modal">
+            <div class="add-student-modal-header">
+                <div class="add-student-modal-title">
+                    <p>Adding Student Account</p>
+                </div>
+                <div class="add-student-modal-close-container">
+                    <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                </div>
+            </div>
+            <div class="add-student-modal-credential-container">
+                <div class="add-student-modal-name-container">
+                    <div><p>Name:</p></div><input type="text" placeholder="Student Name">
+                </div>
+                <div class="add-student-modal-email-container">
+                    <div><p>Email:</p></div><input type="text" placeholder="Student Email">
+                </div>
+                <div class="add-student-modal-id-number-container">
+                    <div><p>ID Number:</p></div><input type="text" placeholder="Student ID Number">
+                </div>
+                <div class="add-student-modal-section-container">
+                    <div><p>Section:</p></div><input type="text" placeholder="Student Section">
+                </div>
+                <div class="add-student-modal-password-container">
+                    <div><p>Password:</p></div><input type="password" placeholder="Student Password">
+                </div>
+            </div>
+            <div class="add-student-modal-delete-confirm-button-container">
+                <div class="add-student-modal-confirm-button">
+                    <p>Confirm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="edit-student-modal-container">
+        <div class="edit-student-modal">
+            <div class="edit-student-modal-header">
+                <div class="edit-student-modal-title">
+                    <p>Editing Student Account</p>
+                </div>
+                <div class="edit-student-modal-close-container">
+                    <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                </div>
+            </div>
+            <div class="edit-student-modal-credential-container">
+                <div class="edit-student-modal-name-container">
+                    <div><p>Name:</p></div><input type="text" placeholder="Khandaker, Khalid T.">
+                </div>
+                <div class="edit-student-modal-email-container">
+                    <div><p>Email:</p></div><input type="text" placeholder="202110233@fit.edu.ph">
+                </div>
+                <div class="edit-student-modal-id-number-container">
+                    <div><p>ID Number:</p></div><input type="text" placeholder="202110233">
+                </div>
+                <div class="edit-student-modal-section-container">
+                    <div><p>Section:</p></div><input type="text" placeholder="Unassigned">
+                </div>
+                <div class="edit-student-modal-password-container">
+                    <div><p>Password:</p></div><input type="password" placeholder="tutoriowl">
+                </div>
+            </div>
+            <div class="edit-student-modal-delete-confirm-button-container">
+                <div class="edit-student-modal-delete-button">
+                    <p>Delete</p>
+                </div>
+                <div class="edit-student-modal-confirm-button">
+                    <p>Confirm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="add-class-section-modal-container">
+        <div class="add-class-section-modal">
+            <form class="add-class-section-form">
+                <div class="add-class-section-modal-top-section">
+                    <div class="add-class-section-modal-title">
+                        <p>Adding Class Section</p>
+                    </div>
+                    <div class="add-class-section-modal-close-container">
+                        <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                    </div>
+                </div>
+                <div class="add-class-section-modal-middle-section">
+                    <div class="add-class-section-modal-section-container">
+                        <p>Section:</p>
+                    </div>
+                    <input type="text" placeholder="Class Section Name" name="class_section_name">
+                </div>
+                <div class="add-class-section-modal-bottom-section">
+                    <button type="submit">Confirm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="rename-section-modal-container">
+        <div class="rename-section-modal">
+            <form class="rename-section-form">
+                <div class="rename-section-modal-top-section">
+                    <div class="rename-section-modal-title">
+                        <p>Renaming Section</p>
+                    </div>
+                    <div class="rename-section-modal-close-container">
+                        <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                    </div>
+                </div>
+                <div class="rename-section-modal-middle-section">
+                    <div class="rename-section-modal-section-container">
+                        <p>Section:</p>
+                    </div>
+                    <input type="text" placeholder="New section name" name="new_class_section_name">
+                </div>
+                <div class="rename-section-modal-bottom-section">
+                    <div class="rename-section-modal-confirm-button">
+                        <p>Confirm</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="edit-class-section-modal-container">
+        <div class="edit-class-section-modal">
+            <div class="edit-class-section-top-section">
+                <div class="edit-class-section-title">
+                    <p>Class Section</p>
+                </div>
+                <div class="edit-class-section-close-container">
+                    <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                </div>
+            </div>
+            <div class="edit-class-section-modal-table-description">
+                <p>Below are the list of students assigned to this section.</p>
+            </div>
+            <div class="edit-class-section-modal-table-data-container">
+                <!-- Edit class section modal table data -->
+            </div>
+            <div class="edit-class-section-modal-delete-rename-button-container">
+                <button class="edit-class-section-modal-delete-button">Delete</button>
+                <button class="edit-class-section-modal-rename-button">Rename</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
