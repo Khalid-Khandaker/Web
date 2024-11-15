@@ -2,7 +2,8 @@
 import { getProfessorDetails, addSection, signOutUser, 
     getAssignedStudents, deleteSection, updateClassSectionName,
     getProfessorTableDocuments, getClassSectionTableDocuments, addCreateProfessor,
-    updateProfessorHandledSections, getProfessorHandledSections, deleteProfessor
+    updateProfessorHandledSections, getProfessorHandledSections, deleteProfessor,
+    getStudentTableDocuments, createStudentAccount
 } from "./utils/firebase";
 
 //The array below are used to prevent click stacking.
@@ -18,9 +19,8 @@ const logoutButton = document.querySelector(".header p");
 const confirmDeletionButton = document.querySelector('.confirm-deletion-modal-confirm-button');
 const confirmDeletionModal = document.querySelector('.confirm-deletion-modal-container');
 const professorNavigationButton = document.querySelector('.professors-text-container');
-const studentNavigationButton = document.querySelector('.students-text-container');
 const classSectionNavigationButton = document.querySelector('.sections-text-container');
-const studentTable = document.querySelector('.student-table');
+
 
 
 //Start of Professor Table Modals
@@ -54,8 +54,11 @@ const confirmEditProfessorButton = document.querySelector('.edit-professor-modal
 
 //Start of Student Table Modals
 const addStudentModal = document.querySelector(".add-student-modal-container");
-const studentTableData = document.querySelector('.student-table-data');
 const editStudentModal = document.querySelector('.edit-student-modal-container');
+const studentTableDataContainer = document.querySelector('.student-table-data-container');
+const studentNavigationButton = document.querySelector('.students-text-container');
+const studentTable = document.querySelector('.student-table');
+const addStudentForm = document.querySelector('.add-student-form');
 //End of Student Table Modals
 
 //Start of Class Section Table Modals
@@ -80,10 +83,12 @@ function initializeHomepage() {
     wakeClassSectionNavigationButton();
     wakeClassSectionTableDataContainer();
     
-    
+    initializeStudentTable();
+    wakeStudentNavigationButton();
+
     initializeProfessorTable();
     wakeProfessorNavigationButton(); 
-    wakeProfessorTableDataContainer()
+    wakeProfessorTableDataContainer();
 
     wakeAddEntityButton("initialization");// Add button default.
 }
@@ -246,7 +251,49 @@ function editClassSectionModalDeleteButtonHandler(classSectionName) {
 }
 //END OF CLASS SECTION BLOCK
 
+//STUDENT BLOCK
+function initializeStudentTable() {
+    studentTableDataContainer.innerHTML = "";
 
+    getStudentTableDocuments()
+        .then((studentsData) => {
+            studentsData.forEach((studentData) => {
+                const studentTableData = createElementWithText('div', '', 'student-table-data');
+                
+                studentTableData.appendChild(createElementWithText('div', `<p>${studentData.idNum}</p>`, 'student-id-container'));
+                studentTableData.appendChild(createElementWithText('div', `<p>${studentData.name}</p>`, 'student-name-container'));
+                studentTableData.appendChild(createElementWithText('div', `<p>${studentData.section}</p>`, 'student-section-container'));
+
+                studentTableDataContainer.appendChild(studentTableData); 
+            });
+        })
+        .catch((error) => {
+            console.error("Failed to initialize student table:", error);
+        });
+}
+
+
+
+
+
+function wakeStudentNavigationButton() {
+    studentNavigationButton.addEventListener('click', studentNavigationButtonHandler);
+} 
+function studentNavigationButtonHandler() {
+    document.querySelector('.sections-text-container > p').style.setProperty('--after-background', 'transparent');
+    document.querySelector('.professors-text-container > p').style.setProperty('--after-background', 'transparent');
+    document.querySelector('.students-text-container > p').style.setProperty('--after-background', '#ad1f48');
+
+    studentTable.style.display = "grid";
+    classSectionTable.style.display = "none";
+    professorTable.style.display = "none";
+    
+    wakeAddEntityButton("student");
+
+    studentNavigationButton.removeEventListener('click', studentNavigationButtonHandler);
+    wakeStudentNavigationButton();
+}
+//END OF STUDENT BLOCK
 
 
 //PROFESSOR BLOCK
@@ -431,81 +478,6 @@ function initializeAssignedSectionsArray(assignedSectionsArray) {
 
     });
 }
-//END OF PROFESSOR BLOCK 
-
-
-
-
-// Add entity button logic.
-function wakeAddEntityButton(from) {
-    addEntityButton.addEventListener('click', () => {
-        addEntityHandler(from);
-
-        clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(() => {
-            addEntity();
-        }, 500);
-    });
-}
-function addEntityHandler(from) {
-    addEntityClicks.push(from);
-}
-function addEntity() {
-    if (addEntityClicks[addEntityClicks.length - 1] == "professor" || addEntityClicks[addEntityClicks.length - 1] == "initialization") {// BUG: Opening and closing add professor modal multiple times
-        let assignedSectionsArray = [];
-
-        addProfessorModal.style.display = "flex";
-
-        addProfessorForm.addEventListener('submit', (addProfessorFormHandlerEvent) => addProfessorFormHandler(addProfessorFormHandlerEvent, assignedSectionsArray), {once : true});
-
-        wakeAssignSectionButton(assignedSectionsArray);
-        wakeRemoveSectionButton(assignedSectionsArray);
-        
-        document.querySelector(".add-professor-modal-close-container").addEventListener("click", function () {
-            addProfessorModal.style.display = "none";
-        });
-        
-        console.log("Inside add professor");
-    } else if (addEntityClicks[addEntityClicks.length - 1] == "classSection") {
-        addClassSectionForm.addEventListener('submit', addClassSectionFormHandler);
-        addClassSectionModal.style.display = "flex";
-
-        console.log("Add Class Sections");
-
-        document.querySelector(".add-class-section-modal-close-container").addEventListener("click", function () {
-            addClassSectionModal.style.display = "none"; 
-        });
-    } else if(addEntityClicks[addEntityClicks.length - 1] == "student") {
-        console.log("Add Student");
-    } else {
-        console.log("Error message here");
-    }
-}
-//End of entity button logic
-
-
-
-
-
-// Helper Function to Create an Element and Set Its Text Content
-const createElementWithText = (tag, text, className) => {
-    const element = document.createElement(tag);
-    element.className = className;
-    element.innerHTML = text;
-    return element;
-};
-
-
-
-
-//If the logout button is insight execute the if statement.
-if (logoutButton) {
-    logoutButton.addEventListener('click', function () {
-        signOutUser().then((homepage) => {
-            window.location.href = homepage;
-        });
-    }, {once : true});// Automatically reset event listeners once the session ends.
-}
 
 
 
@@ -671,4 +643,102 @@ function addSectionFormHandler(addSectionFormEvent, assignedSectionsArray, profe
 
     deleteSectionForm.removeEventListener('submit', (addSectionFormEvent) => addSectionFormHandler(addSectionFormEvent, assignedSectionsArray, professorName));
     addSectionModal.style.display = "none";
+}
+//END OF PROFESSOR BLOCK 
+
+
+
+
+
+// Add entity button logic.
+function wakeAddEntityButton(from) {
+    addEntityButton.addEventListener('click', () => {
+        addEntityHandler(from);
+
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+            addEntity();
+        }, 500);
+    });
+}
+function addEntityHandler(from) {
+    addEntityClicks.push(from);
+}
+function addEntity() {
+    if (addEntityClicks[addEntityClicks.length - 1] == "professor" || addEntityClicks[addEntityClicks.length - 1] == "initialization") {
+        let assignedSectionsArray = [];
+
+        addProfessorModal.style.display = "flex";
+
+        addProfessorForm.addEventListener('submit', (addProfessorFormHandlerEvent) => addProfessorFormHandler(addProfessorFormHandlerEvent, assignedSectionsArray), {once : true});
+
+        wakeAssignSectionButton(assignedSectionsArray);
+        wakeRemoveSectionButton(assignedSectionsArray);
+        
+        document.querySelector(".add-professor-modal-close-container").addEventListener("click", function () {
+            addProfessorModal.style.display = "none";
+        });
+        
+        console.log("Inside add professor");
+    } else if (addEntityClicks[addEntityClicks.length - 1] == "classSection") {
+        addClassSectionForm.addEventListener('submit', addClassSectionFormHandler);
+        addClassSectionModal.style.display = "flex";
+
+        console.log("Add Class Sections");
+
+        document.querySelector(".add-class-section-modal-close-container").addEventListener("click", function () {
+            addClassSectionModal.style.display = "none"; 
+        });
+    } else if(addEntityClicks[addEntityClicks.length - 1] == "student") {
+        addStudentModal.style.display = "flex";
+
+        addStudentForm.addEventListener('submit', (addStudentFormEvent) => addStudentFormHandler(addStudentFormEvent));
+
+        document.querySelector('.add-student-modal-close-container').addEventListener('click', function() {
+            addStudentModal.style.display = "none";
+        });
+    } else {
+        console.log("Error message here");
+    }
+}
+//End of entity button logic
+
+
+function addStudentFormHandler(addStudentFormEvent) {
+    addStudentFormEvent.preventDefault();
+    addStudentFormEvent.stopPropagation();
+
+    const studentIdNumber = addStudentForm.student_id_number.value;
+    const studentName =  addStudentForm.student_name.value;
+    const studentEmail = addStudentForm.student_email.value;
+    const studentPassword = addStudentForm.student_password.value;
+    const studentSection = addStudentForm.student_section.value;
+
+    createStudentAccount(studentIdNumber, studentName, studentEmail, studentPassword, studentSection).then((message) => {
+        initializeStudentTable();
+        addStudentForm.reset();
+        addStudentModal.style = "none";
+    });
+
+    addStudentForm.removeEventListener('submit', (addStudentFormEvent) => addStudentFormHandler(addStudentFormEvent));
+    addEntityButton.removeEventListener('click', wakeAddEntityButton);
+
+    wakeAddEntityButton("student");
+}
+
+
+// Helper Function to Create an Element and Set Its Text Content
+const createElementWithText = (tag, text, className) => {
+    const element = document.createElement(tag);
+    element.className = className;
+    element.innerHTML = text;
+    return element;
+};
+//If the logout button is insight execute the if statement.
+if (logoutButton) {
+    logoutButton.addEventListener('click', function () {
+        signOutUser().then((homepage) => {
+            window.location.href = homepage;
+        });
+    }, {once : true});// Automatically reset event listeners once the session ends.
 }

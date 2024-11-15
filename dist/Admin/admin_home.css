@@ -233,7 +233,7 @@ body {
 
     overflow-y: auto;
 
-    display: none;
+    display: grid;
     grid-template-columns: repeat(auto-fill 1fr);
     row-gap: 6px;
 }
@@ -251,6 +251,7 @@ body {
 }
 .student-table-data:hover {
     background-color: #14011e;
+
     cursor: pointer;
 }
 
@@ -1519,23 +1520,22 @@ body {
 }
 
 .add-student-modal-confirm-button {
+    background-color: #0c0012;
+
     padding: 4px 16px;
     border: 2px solid #470c77; 
 
     transition: border-radius 0.2s;
     transition: background-color 0.2s;
+    
+    font-size: 16px;
+    font-weight: 400;
+    color: #cacaca;
 }
 .add-student-modal-confirm-button:hover {
     cursor: pointer; 
     background-color: #1b0229;
     border-radius: 6px;
-}
-.add-student-modal-confirm-button p {
-    margin: 0px;
-    
-    font-size: 16px;
-    font-weight: 400;
-    color: #cacaca;
 }
 /*End of Add Student Modal*/
 

@@ -54,7 +54,7 @@
             </div>
         </div>
         <div class="student-table-data-container">
-            <div class="student-table-data">
+            <!-- <div class="student-table-data">
                 <div class="student-id-container">
                     <p>202110233</p>
                 </div>
@@ -64,7 +64,7 @@
                 <div class="student-section-container">
                     <p>TN21</p>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
     <div class="class-section-table">
@@ -278,38 +278,38 @@
         </div>
     </div>
     <div class="add-student-modal-container">
-        <div class="add-student-modal">
-            <div class="add-student-modal-header">
-                <div class="add-student-modal-title">
-                    <p>Adding Student Account</p>
+        <form class="add-student-form">
+            <div class="add-student-modal">
+                <div class="add-student-modal-header">
+                    <div class="add-student-modal-title">
+                        <p>Adding Student Account</p>
+                    </div>
+                    <div class="add-student-modal-close-container">
+                        <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                    </div>
                 </div>
-                <div class="add-student-modal-close-container">
-                    <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                <div class="add-student-modal-credential-container">
+                    <div class="add-student-modal-name-container">
+                        <div><p>Name:</p></div><input type="text" placeholder="Student Name" name="student_name">
+                    </div>
+                    <div class="add-student-modal-email-container">
+                        <div><p>Email:</p></div><input type="text" placeholder="Student Email" name="student_email">
+                    </div>
+                    <div class="add-student-modal-id-number-container">
+                        <div><p>ID Number:</p></div><input type="text" placeholder="Student ID Number" name="student_id_number">
+                    </div>
+                    <div class="add-student-modal-section-container">
+                        <div><p>Section:</p></div><input type="text" placeholder="Student Section" name="student_section">
+                    </div>
+                    <div class="add-student-modal-password-container">
+                        <div><p>Password:</p></div><input type="password" placeholder="Student Password" name="student_password">
+                    </div>
+                </div>
+                <div class="add-student-modal-delete-confirm-button-container">
+                    <button class="add-student-modal-confirm-button" type="submit">Confirm</button>
                 </div>
             </div>
-            <div class="add-student-modal-credential-container">
-                <div class="add-student-modal-name-container">
-                    <div><p>Name:</p></div><input type="text" placeholder="Student Name">
-                </div>
-                <div class="add-student-modal-email-container">
-                    <div><p>Email:</p></div><input type="text" placeholder="Student Email">
-                </div>
-                <div class="add-student-modal-id-number-container">
-                    <div><p>ID Number:</p></div><input type="text" placeholder="Student ID Number">
-                </div>
-                <div class="add-student-modal-section-container">
-                    <div><p>Section:</p></div><input type="text" placeholder="Student Section">
-                </div>
-                <div class="add-student-modal-password-container">
-                    <div><p>Password:</p></div><input type="password" placeholder="Student Password">
-                </div>
-            </div>
-            <div class="add-student-modal-delete-confirm-button-container">
-                <div class="add-student-modal-confirm-button">
-                    <p>Confirm</p>
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
     <div class="edit-student-modal-container">
         <div class="edit-student-modal">

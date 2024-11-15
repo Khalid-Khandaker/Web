@@ -412,3 +412,56 @@ export const deleteProfessor = async (professorName) => {
         return "Error deleting professor";
     }
 } 
+
+
+
+
+export const getStudentTableDocuments = async () => {
+    try {
+        const studentsCollectionReference = collection(database, 'students');
+        const studentsSnapshot = await getDocs(studentsCollectionReference);
+
+        const studentRecords = studentsSnapshot.docs.map(doc => ({
+            id: doc.id,       
+            ...doc.data()      
+        }));
+
+        return studentRecords;
+    } catch (error) {
+        console.error('Error retrieving student records:', error);
+        return [];
+    }
+}
+
+
+
+
+
+
+export const createStudentAccount = async (studentIdNumber, studentName, studentEmail, studentPassword, studentSection) => {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(authentication, studentEmail, studentPassword);
+        const studentUID = userCredential.user.uid;
+
+        await updateProfile(userCredential.user, { displayName: studentName });
+
+        const studentData = {
+            idNum: studentIdNumber,
+            name: studentName,
+            section: studentSection,
+            uid: studentUID,
+        };
+
+        const studentsReference = collection(database, 'students');
+        await setDoc(doc(studentsReference), studentData);
+
+        const usersReference = collection(database, 'users');
+        const userData = { ...studentData, userType: 'student' };
+        await setDoc(doc(usersReference), userData);
+
+        return `Student account created successfully for ${studentName}`;
+    } catch (error) {
+        console.error('Error creating student account:', error);
+        return 'Error creating student account';
+    }
+};
