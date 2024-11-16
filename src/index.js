@@ -104,20 +104,14 @@ function initializeClassSectionTable() {
     classSectionTableDataContainer.innerHTML = "";
     getClassSectionTableDocuments().then((sectionsData) => {
         sectionsData.forEach((sectionData) => {
-            const isDisplayed = Array.from(classSectionTableDataContainer.children).some(child => 
-                child.querySelector('.class-section-name-container p')?.textContent == sectionData.name
-            );
+            // Create the main container
+            const classSectionTableData = createElementWithText('div', '', 'class-section-table-data');
+            // Create and append child containers
+            classSectionTableData.appendChild(createElementWithText('div', `<p>${sectionData.name}</p>`, 'class-section-name-container'));
+            classSectionTableData.appendChild(createElementWithText('div', `<p>${sectionData.studentCount} / 40</p>`, 'class-section-slot-container'));
+            classSectionTableData.appendChild(createElementWithText('div', `<p>${sectionData.assignedTo}</p>`, 'class-section-assigned-to-container'));
 
-            if(!isDisplayed) {
-                // Create the main container
-                const classSectionTableData = createElementWithText('div', '', 'class-section-table-data');
-                // Create and append child containers
-                classSectionTableData.appendChild(createElementWithText('div', `<p>${sectionData.name}</p>`, 'class-section-name-container'));
-                classSectionTableData.appendChild(createElementWithText('div', `<p>${sectionData.studentCount} / 40</p>`, 'class-section-slot-container'));
-                classSectionTableData.appendChild(createElementWithText('div', `<p>${sectionData.assignedTo}</p>`, 'class-section-assigned-to-container'));
-
-                classSectionTableDataContainer.appendChild(classSectionTableData); 
-            }
+            classSectionTableDataContainer.appendChild(classSectionTableData); 
         })
     });
 }
@@ -150,15 +144,19 @@ function addClassSectionFormHandler(addSectionFormHandlerEvent) {
     addSectionFormHandlerEvent.preventDefault();
     
     const classSectionName = addClassSectionForm.class_section_name.value;
-    
-    addSection(classSectionName).then(() => {
+
+    addSection(classSectionName).then((successMessage) => {
         initializeClassSectionTable();
         addClassSectionForm.reset();
-        addClassSectionModal.style = "none";
-    }).catch((err) => {
-        console.log(err.message);
-    });
-    
+        
+        addClassSectionModal.style.display = "none";
+        
+        console.log(successMessage);
+        })
+        .catch((err) => {
+            console.error("Error adding class section:", err.message);
+        });
+
     addClassSectionForm.removeEventListener('submit', addClassSectionFormHandler);
     addEntityButton.removeEventListener('click', wakeAddEntityButton);
 
@@ -224,6 +222,8 @@ function renameClassSectionFormHandler(renameClassSectionFormHandlerEvent, class
         const newClassSectionName = renameClassSectionForm.new_class_section_name.value;
     
         updateClassSectionName(classSectionName, newClassSectionName).then((message) => {
+            renameClassSectionForm.reset();
+
             console.log(message);
             
             initializeClassSectionTable();
@@ -397,24 +397,24 @@ function addProfessorFormHandler(addProfessorFormHandlerEvent, assignedSectionsA
     const professorPassword = addProfessorForm.professor_password.value;
 
     addCreateProfessor(professorName, professorEmail, professorPassword, assignedSectionsArray).then((message) => {
-        addProfessorForm.reset();
-        assignedSectionsContainer.innerHTML = "";
-        addProfessorModal.style = "none";
-
         initializeProfessorTable();
+        addProfessorForm.reset();
 
-        console.log(message);
+        assignedSectionsContainer.innerHTML = "";
+        addProfessorModal.style.display = "none";
+
+        console.log(message)
+    })
+    .catch((error) => {
+        console.error("Error:", error.message);
     });
 
-    addProfessorForm.removeEventListener('submit', (addProfessorFormHandlerEvent) => addProfessorFormHandler(addProfessorFormHandlerEvent, assignedSectionsArray));
+    addProfessorForm.removeEventListener('submit', (e) => addProfessorFormHandler(e, assignedSectionsArray));
     addEntityButton.removeEventListener('click', wakeAddEntityButton);
-
-    assignSectionButton.removeEventListener('click', assignSectionHandler);
-    removeSectionButton.removeEventListener('click', removeSectionButtonHandler);
-
-    assignSectionButton.removeEventListener('click', () => assignSectionHandler(assignedSectionsArray), {once : true});
-    removeSectionButton.removeEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray), {once : true});
+    assignSectionButton.removeEventListener('click', () => assignSectionHandler(assignedSectionsArray), { once: true });
+    removeSectionButton.removeEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray), { once: true });
 }
+
 
 
 
@@ -726,12 +726,12 @@ function addEntity() {
             addProfessorModal.style.display = "none";
         });
         
-        console.log("Inside add professor");
+        console.log("Inside add class section");
     } else if (addEntityClicks[addEntityClicks.length - 1] == "classSection") {
         addClassSectionForm.addEventListener('submit', addClassSectionFormHandler);
         addClassSectionModal.style.display = "flex";
 
-        console.log("Add Class Sections");
+        console.log("Add class section modal");
 
         document.querySelector(".add-class-section-modal-close-container").addEventListener("click", function () {
             addClassSectionModal.style.display = "none"; 

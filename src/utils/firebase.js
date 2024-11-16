@@ -31,6 +31,7 @@ const authentication = getAuth(app);
 
 
 
+
 //This function is used to sign in user and direct them to appropriate page.
 export const signIn = async (email, password) => {
     const credentials = await signInWithEmailAndPassword(authentication, email, password);
@@ -47,15 +48,8 @@ export const signIn = async (email, password) => {
 }
 
 
-//This function will add users document to users collection.
-// const addUserToDB = async (uid, userType, email) => {
-//     const docRef = await addDoc(collection(database, "users"), {
-//         uid: uid,
-//         user_type: userType,
-//         username: email
-//     });
-//     return docRef;
-// }
+
+
 
 
 //This function is used to update class section name inside class sections collection.
@@ -79,6 +73,8 @@ export const updateClassSectionName = async (oldClassSectionName, newClassSectio
         throw new Error(`Failed to update document: ${error.message}`);
     }
 };
+
+
 
 
 
@@ -126,6 +122,9 @@ export const getAssignedStudents = async (classSectionName) => {
 
 
 
+
+
+
 //This function is used to delete class section document inside classSections collection
 export const deleteSection = async (classSectionName) => {
     const sectionsCollectionReference = collection(database, "classSections");
@@ -142,11 +141,6 @@ export const deleteSection = async (classSectionName) => {
 };      
 
 
-//This function is used for signing out users.
-export const signOutUser = async () => {
-    signOut(authentication);
-    return "../login.html";
-}
 
 
 
@@ -154,53 +148,123 @@ export const signOutUser = async () => {
 //This function is used to create professor account and add professor document to professors collection.
 export const addCreateProfessor = async (professorName, professorEmail, professorPassword, assignedSectionsArray) => {
     try {
+        // Ensure all sections are valid before proceeding to professor creation
+        for (const sectionName of assignedSectionsArray) {
+            // Check if the section exists in the classSections collection
+            const sectionQuery = query(
+                collection(database, "classSections"),
+                where("name", "==", sectionName)
+            );
+            const sectionQuerySnapshot = await getDocs(sectionQuery);
+
+            if (sectionQuerySnapshot.empty) {
+                // If the section does not exist, throw an error and stop
+                throw new Error(`Section "${sectionName}" does not exist in the classSections collection.`);
+            }
+
+            // Check if the section is already assigned
+            const sectionDoc = sectionQuerySnapshot.docs[0];
+            const assignedTo = sectionDoc.data().assignedTo;
+
+            if (assignedTo && assignedTo !== "No professor assigned") {
+                // If the section is already assigned to someone else, throw an error
+                throw new Error(`Section "${sectionName}" is already assigned to another professor.`);
+            }
+        }
+
+        // Create the professor only if all section checks pass
         const userCredential = await createUserWithEmailAndPassword(authentication, professorEmail, professorPassword);
         const user = userCredential.user;
         const professorUID = user.uid;
-       
+
         const professorData = {
             uid: professorUID,
             name: professorName,
             userType: "professor"
         };
-    
+
+        // Add professor document in the professors collection
         const professorDocRef = await addDoc(collection(database, "professors"), professorData);
-    
+
+        // Reference to the handledSections subcollection
         const handledSectionsCollectionRef = collection(professorDocRef, "handledSections");
-    
+
+        // Now that the sections are validated, we can assign them
         if (assignedSectionsArray.length > 0) {
-            for (const section of assignedSectionsArray) {
-                await addDoc(handledSectionsCollectionRef, { name: section });
+            for (const sectionName of assignedSectionsArray) {
+                // Add each section to the handledSections subcollection
+                await addDoc(handledSectionsCollectionRef, { name: sectionName });
+
+                // Update the assignedTo field in the classSections collection
+                const sectionDocQuery = query(
+                    collection(database, "classSections"),
+                    where("name", "==", sectionName)
+                );
+                const sectionDocs = await getDocs(sectionDocQuery);
+
+                sectionDocs.forEach(async (docSnapshot) => {
+                    await updateDoc(docSnapshot.ref, { assignedTo: professorName });
+                });
             }
         } else {
-            await addDoc(handledSectionsCollectionRef, { placeholder: true });
+            // No assigned sections; add a placeholder
+            await addDoc(handledSectionsCollectionRef, { name: "No Handled Section" });
         }
-    
+
+        // Add professor to the users collection
         const usersDocRef = doc(database, "users", professorDocRef.id);
         await setDoc(usersDocRef, professorData);
-    
+
         return "Professor created successfully";
-    
     } catch (error) {
         console.error("Error creating professor:", error.message);
         throw new Error("Failed to create professor: " + error.message);
-    }    
+    }
 };
+
+
+
+
+
+
+
+
+
+
 
 
 
 //This function is used for adding class section document inside classSections collection.
 export const addSection = async (classSectionName) => {
-    const sectionDocumentReference = await addDoc(collection(database, "classSections"), {
-        name: classSectionName,
-        assignedTo: ""
-    });
-    const studentsSubcollectionReference = collection(sectionDocumentReference,"students");
-    await addDoc(studentsSubcollectionReference, {
-        idnumber : "202110233",
-        name : "Khandaker, Khalid Uzzaman T."
-    });
-}
+    try {
+        const classSectionsCollection = collection(database, "classSections");
+        const sectionQuery = query(classSectionsCollection, where("name", "==", classSectionName));
+        const querySnapshot = await getDocs(sectionQuery);
+
+        if (!querySnapshot.empty) {
+            throw new Error(`Class section "${classSectionName}" already exists.`);
+        }
+
+        const sectionDocumentReference = await addDoc(classSectionsCollection, {
+            name: classSectionName,
+            assignedTo: "No professor assigned"
+        });
+
+        const studentsSubcollectionReference = collection(sectionDocumentReference, "students");
+        await addDoc(studentsSubcollectionReference, {
+            idnumber: "TEMP",
+            name: "Temporary Placeholder Student"
+        });
+
+        return `Class section "${classSectionName}" created successfully!`;
+    } catch (error) {
+        return `Error: ${error.message}`;
+    }
+};
+
+
+
+
 
 
 
@@ -228,6 +292,9 @@ export const getClassSectionTableDocuments = async () => {
 
 
 
+
+
+
 //This function is used to retrieve professor documents inside professors collection.
 export const getProfessorTableDocuments = async () => {
     const professorsCollection = collection(database, "professors");
@@ -252,6 +319,8 @@ export const getProfessorTableDocuments = async () => {
 
 
 
+
+
 //This function is used to count the total student enrolled on a particular section.
 async function countSubcollection(documentReference, subCollectionName) {
     const studentsSubcollectionReference = collection(documentReference, subCollectionName);
@@ -261,11 +330,6 @@ async function countSubcollection(documentReference, subCollectionName) {
 }
 
 
-
-
-export const getAuthentication = () => {
-    return authentication;
-}
 
 
 
@@ -291,6 +355,9 @@ async function assignSection(professorDocRef, sectionName) {
 
 
 
+
+
+//Returns all professor handled sections
 export const getProfessorHandledSections = async (professorName) => {  
     let handledSectionsName = [];
 
@@ -323,7 +390,8 @@ export const getProfessorHandledSections = async (professorName) => {
 
 
 
-//This function retrieves professor handled sections.
+
+//This function retrieves all professor handled sections.
 export const updateProfessorHandledSections = async (professorName, assignedSectionsArray) => {
     try {
         const professorsRef = collection(database, "professors");
@@ -372,7 +440,9 @@ export const updateProfessorHandledSections = async (professorName, assignedSect
 
 
 
-//Is this function going to delete all documents in users, and professors collection that matches professorName 
+
+
+//This function going to delete all documents in users, and professors collection that matches professorName 
 export const deleteProfessor = async (professorName) => {
     try {
         const professorsRef = collection(database, "professors");
@@ -416,6 +486,9 @@ export const deleteProfessor = async (professorName) => {
 
 
 
+
+
+//This function returns all student data for student table.
 export const getStudentTableDocuments = async () => {
     try {
         const studentsCollectionReference = collection(database, 'students');
@@ -438,6 +511,7 @@ export const getStudentTableDocuments = async () => {
 
 
 
+//This function will create new student account.
 export const createStudentAccount = async (studentIdNumber, studentName, studentEmail, studentPassword, studentSection) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(authentication, studentEmail, studentPassword);
@@ -470,19 +544,19 @@ export const createStudentAccount = async (studentIdNumber, studentName, student
 
 
 
+
+//This function returns specific student data.
 export const getStudentData = async (studentId) => {
     try {
-        // Query the 'students' collection where idNum matches studentId
         const studentsCollection = collection(database, 'students');
         const q = query(studentsCollection, where("idNum", "==", studentId));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-            const studentDocument = querySnapshot.docs[0]; // Assuming idNum is unique
+            const studentDocument = querySnapshot.docs[0]; 
             const studentData = studentDocument.data();
             const { idNum, name, section} = studentData;
 
-            // Return student data
             const studentArray = [idNum, name, section];
             return studentArray;
         } else {
@@ -494,3 +568,32 @@ export const getStudentData = async (studentId) => {
         return null;
     }
 };
+
+
+
+
+
+export const getAuthentication = () => {
+    return authentication;
+}
+//This function is used for signing out users.
+export const signOutUser = async () => {
+    signOut(authentication);
+    return "../login.html";
+}
+
+
+
+
+
+
+//TODO: Professor class sections grabbing
+// > Grab class section during professor creation
+// > Grab class section during professor edit
+// > Display error assigning class section if the class section is already taken
+// > Deleting professor account will remove its handled sections
+
+// - Check assignedSectionsArray if empty then create a document inside the handledSections subcollection and set the name property to "No Handled Section".
+// - If assignedSectionsArray is not empty get the values and set the array values to section name
+// - Before assigning the sections to the professor check first the classSections collection documents if the section is already beein assigned by checking the property assignedTo 
+// - If one of the section in the array has been already owned by other profesor cancel the creation of professor and display error, if not add the section to the handledSections subcollection and change the property value of assignedTo = professor name
