@@ -465,3 +465,32 @@ export const createStudentAccount = async (studentIdNumber, studentName, student
         return 'Error creating student account';
     }
 };
+
+
+
+
+
+export const getStudentData = async (studentId) => {
+    try {
+        // Query the 'students' collection where idNum matches studentId
+        const studentsCollection = collection(database, 'students');
+        const q = query(studentsCollection, where("idNum", "==", studentId));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const studentDocument = querySnapshot.docs[0]; // Assuming idNum is unique
+            const studentData = studentDocument.data();
+            const { idNum, name, section} = studentData;
+
+            // Return student data
+            const studentArray = [idNum, name, section];
+            return studentArray;
+        } else {
+            console.log("No matching student document!");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error retrieving student data:", error);
+        return null;
+    }
+};

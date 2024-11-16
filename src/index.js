@@ -3,7 +3,7 @@ import { getProfessorDetails, addSection, signOutUser,
     getAssignedStudents, deleteSection, updateClassSectionName,
     getProfessorTableDocuments, getClassSectionTableDocuments, addCreateProfessor,
     updateProfessorHandledSections, getProfessorHandledSections, deleteProfessor,
-    getStudentTableDocuments, createStudentAccount
+    getStudentTableDocuments, createStudentAccount, getStudentData
 } from "./utils/firebase";
 
 //The array below are used to prevent click stacking.
@@ -59,6 +59,11 @@ const studentTableDataContainer = document.querySelector('.student-table-data-co
 const studentNavigationButton = document.querySelector('.students-text-container');
 const studentTable = document.querySelector('.student-table');
 const addStudentForm = document.querySelector('.add-student-form');
+const studentNameInput = document.querySelector('#student-name-input');
+const studentEmailInput = document.querySelector('#student-email-input');
+const studentIdNumberInput = document.querySelector('#student-idnumber-input');
+const studentSectionInput = document.querySelector('#student-section-input');
+const studentPasswordInput = document.querySelector('#student-password-input');
 //End of Student Table Modals
 
 //Start of Class Section Table Modals
@@ -85,6 +90,7 @@ function initializeHomepage() {
     
     initializeStudentTable();
     wakeStudentNavigationButton();
+    wakeStudentTableDataContainer();
 
     initializeProfessorTable();
     wakeProfessorNavigationButton(); 
@@ -293,7 +299,48 @@ function studentNavigationButtonHandler() {
     studentNavigationButton.removeEventListener('click', studentNavigationButtonHandler);
     wakeStudentNavigationButton();
 }
+
+
+
+
+function wakeStudentTableDataContainer() {
+    studentTableDataContainer.addEventListener('click', (studentTableDataContainerEvent) => studentTableDataContainerHandler(studentTableDataContainerEvent));
+}
+function studentTableDataContainerHandler(studentTableDataContainerEvent) {
+    studentTableDataContainerEvent.preventDefault();
+    const studentId = studentTableDataContainerEvent.target.querySelector('.student-id-container').textContent;
+
+    getStudentData(studentId).then((studentDataArray) => {
+        if (studentDataArray) {
+            const [idNum, name, section] = studentDataArray;
+
+            studentNameInput.placeholder = name;
+            studentIdNumberInput.placeholder = idNum;
+            studentSectionInput.placeholder = section;
+
+            editStudentModal.style.display = "flex";
+        } else {
+            console.log("Student data not found.");
+        }
+    }).catch((error) => {
+        console.error("Error fetching student data:", error);
+    });
+
+    document.querySelector('.edit-student-modal-close-container').addEventListener('click', function() {
+        editStudentModal.style.display = "none";
+
+        studentTableDataContainer.removeEventListener('click', (studentTableDataContainerEvent) => studentTableDataContainerHandler(studentTableDataContainerEvent));
+        wakeStudentTableDataContainer();
+    });
+
+    //Wake delete account button
+    //Wake Update button 
+
+
+}
 //END OF STUDENT BLOCK
+
+
 
 
 //PROFESSOR BLOCK

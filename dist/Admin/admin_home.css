@@ -273,6 +273,8 @@ body {
     height: 20px;
 
     overflow: hidden;
+
+    pointer-events: none;
 }
 .class-section-table {
     display: none;
@@ -353,7 +355,7 @@ body {
 
     overflow: hidden;
 
-    pointer-events: none;;
+    pointer-events: none;
 }
 .professor-name-container,
 .professor-username-container,
@@ -1602,26 +1604,20 @@ body {
     padding: 12px 24px;
 }
 .edit-student-modal-name-container,
-.edit-student-modal-email-container,
 .edit-student-modal-id-number-container,
-.edit-student-modal-section-container,
-.edit-student-modal-password-container {
+.edit-student-modal-section-container {
     display: flex;
 
     padding: 4px 0px;
 }
 .edit-student-modal-name-container div,
-.edit-student-modal-email-container div,
 .edit-student-modal-id-number-container div,
-.edit-student-modal-section-container div,
-.edit-student-modal-password-container div {
+.edit-student-modal-section-container div {
     width: 110px;
 }
 .edit-student-modal-name-container div > p,
-.edit-student-modal-email-container div > p,
 .edit-student-modal-id-number-container div > p,
-.edit-student-modal-section-container div > p,
-.edit-student-modal-password-container div > p {
+.edit-student-modal-section-container div > p {
     font-size: 16px;
     font-weight: 200;
 
@@ -1630,10 +1626,8 @@ body {
     margin: 0px;
 }
 .edit-student-modal-name-container input,
-.edit-student-modal-email-container input,
 .edit-student-modal-id-number-container input,
-.edit-student-modal-section-container input,
-.edit-student-modal-password-container input {
+.edit-student-modal-section-container input {
     border: none;
     border-bottom: 1px solid #9a9a9a;
 
@@ -1645,17 +1639,13 @@ body {
     flex: 1;
 }
 .edit-student-modal-name-container input::placeholder,
-.edit-student-modal-email-container input::placeholder,
 .edit-student-modal-id-number-container input::placeholder,
-.edit-student-modal-section-container input::placeholder,
-.edit-student-modal-password-container input::placeholder {
+.edit-student-modal-section-container input::placeholder {
     color: #873510;
 }
 .edit-student-modal-name-container input:focus,
-.edit-student-modal-email-container input:focus,
 .edit-student-modal-id-number-container input:focus,
-.edit-student-modal-section-container input:focus,
-.edit-student-modal-password-container input:focus {
+.edit-student-modal-section-container input:focus {
     outline: none;
 }
 .edit-student-modal-add-delete-container {
@@ -1696,11 +1686,17 @@ body {
 }
 .edit-student-modal-delete-button,
 .edit-student-modal-confirm-button {
+    background-color: #0c0012;
+
     padding: 4px 16px;
     border: 2px solid #470c77; 
 
     transition: border-radius 0.2s;
     transition: background-color 0.2s;
+    
+    font-size: 16px;
+    font-weight: 400;
+    color: #cacaca;
 }
 .edit-student-modal-delete-button {
     border: 2px solid #ef224b;
@@ -1714,14 +1710,6 @@ body {
     cursor: pointer;
     background-color: #ff00332c;
     border-radius: 6px;
-}
-.edit-student-modal-delete-button p,
-.edit-student-modal-confirm-button p {
-    margin: 0px;
-    
-    font-size: 16px;
-    font-weight: 400;
-    color: #cacaca;
 }
 /*End of Edit Student Modal*/
 

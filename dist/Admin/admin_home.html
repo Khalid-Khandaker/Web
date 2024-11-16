@@ -312,41 +312,33 @@
         </form>
     </div>
     <div class="edit-student-modal-container">
-        <div class="edit-student-modal">
-            <div class="edit-student-modal-header">
-                <div class="edit-student-modal-title">
-                    <p>Editing Student Account</p>
+        <form class="edit-student-form">
+            <div class="edit-student-modal">
+                <div class="edit-student-modal-header">
+                    <div class="edit-student-modal-title">
+                        <p>Editing Student Account</p>
+                    </div>
+                    <div class="edit-student-modal-close-container">
+                        <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                    </div>
                 </div>
-                <div class="edit-student-modal-close-container">
-                    <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                <div class="edit-student-modal-credential-container">
+                    <div class="edit-student-modal-name-container">
+                        <div><p>Name:</p></div><input type="text" placeholder="" id="student-name-input">
+                    </div>
+                    <div class="edit-student-modal-id-number-container">
+                        <div><p>ID Number:</p></div><input type="text" placeholder="" id="student-idnumber-input">
+                    </div>
+                    <div class="edit-student-modal-section-container">
+                        <div><p>Section:</p></div><input type="text" placeholder="" id="student-section-input">
+                    </div>
                 </div>
-            </div>
-            <div class="edit-student-modal-credential-container">
-                <div class="edit-student-modal-name-container">
-                    <div><p>Name:</p></div><input type="text" placeholder="Khandaker, Khalid T.">
-                </div>
-                <div class="edit-student-modal-email-container">
-                    <div><p>Email:</p></div><input type="text" placeholder="202110233@fit.edu.ph">
-                </div>
-                <div class="edit-student-modal-id-number-container">
-                    <div><p>ID Number:</p></div><input type="text" placeholder="202110233">
-                </div>
-                <div class="edit-student-modal-section-container">
-                    <div><p>Section:</p></div><input type="text" placeholder="Unassigned">
-                </div>
-                <div class="edit-student-modal-password-container">
-                    <div><p>Password:</p></div><input type="password" placeholder="tutoriowl">
-                </div>
-            </div>
-            <div class="edit-student-modal-delete-confirm-button-container">
-                <div class="edit-student-modal-delete-button">
-                    <p>Delete</p>
-                </div>
-                <div class="edit-student-modal-confirm-button">
-                    <p>Confirm</p>
+                <div class="edit-student-modal-delete-confirm-button-container">
+                    <button class="edit-student-modal-delete-button" type="button">Delete</button>
+                    <button class="edit-student-modal-confirm-button" type="submit">Confirm</button>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
     <div class="add-class-section-modal-container">
         <div class="add-class-section-modal">
