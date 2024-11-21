@@ -101,7 +101,7 @@ function initializeHomepage() {
 
 //CLASS SECTION BLOCK
 function initializeClassSectionTable() {
-    classSectionTableDataContainer.innerHTML = "";
+    classSectionTableDataContainer.innerHTML = ""; 
     getClassSectionTableDocuments().then((sectionsData) => {
         sectionsData.forEach((sectionData) => {
             // Create the main container
@@ -123,6 +123,7 @@ function wakeClassSectionNavigationButton() {
     classSectionNavigationButton.addEventListener('click', classSectionNavigationButtonHandler);
 } 
 function classSectionNavigationButtonHandler() {
+    initializeClassSectionTable();
     document.querySelector('.sections-text-container > p').style.setProperty('--after-background', '#ad1f48');
     document.querySelector('.professors-text-container > p').style.setProperty('--after-background', 'transparent');
     document.querySelector('.students-text-container > p').style.setProperty('--after-background', 'transparent');
@@ -130,6 +131,7 @@ function classSectionNavigationButtonHandler() {
     classSectionTable.style.display = "grid";
     professorTable.style.display = "none";
     studentTable.style.display = "none";
+
     
     wakeAddEntityButton("classSection");
 
@@ -352,18 +354,23 @@ function initializeProfessorTable() {
             professorTableData.appendChild(createElementWithText('div', `<p>${professor.name}</p>`, 'professor-name-container'));
             
             const professorHandledSection = createElementWithText('div', '', 'professor-handled-section-container');
-            if(professor.handledSections.length > 0) {
+
+            if (Array.isArray(professor.handledSections) && professor.handledSections.length > 0) {
+                // Display all handled sections if available
                 professor.handledSections.forEach((section) => {
                     professorHandledSection.appendChild(createElementWithText('div', `<p>${section.name}</p>`, 'handled-section'));
-                });  
+                });
             } else {
-                console.log("No handled sections");
+                // Display a default message if no handled sections are found
+                professorHandledSection.appendChild(createElementWithText('div', `<p>No Handled Sections</p>`, 'no-handled-sections'));
             }
-            professorTableDataContainer.appendChild(professorTableData);
+
             professorTableData.appendChild(professorHandledSection);
-        })
+            professorTableDataContainer.appendChild(professorTableData);
+        });
     });
 }
+
 
 
 
@@ -388,7 +395,7 @@ function professorNavigationButtonHandler() {
 
 
 
-
+//ADD PROFESSOR FORM HANDLER
 function addProfessorFormHandler(addProfessorFormHandlerEvent, assignedSectionsArray) {
     addProfessorFormHandlerEvent.preventDefault();
   
@@ -398,22 +405,31 @@ function addProfessorFormHandler(addProfessorFormHandlerEvent, assignedSectionsA
 
     addCreateProfessor(professorName, professorEmail, professorPassword, assignedSectionsArray).then((message) => {
         initializeProfessorTable();
+        
         addProfessorForm.reset();
 
         assignedSectionsContainer.innerHTML = "";
+
         addProfessorModal.style.display = "none";
 
-        console.log(message)
+        console.log(message);
     })
     .catch((error) => {
         console.error("Error:", error.message);
-    });
 
-    addProfessorForm.removeEventListener('submit', (e) => addProfessorFormHandler(e, assignedSectionsArray));
+        addProfessorForm.reset();
+
+        assignedSectionsContainer.innerHTML = "";
+
+        addProfessorModal.style.display = "none";
+    });
+    // Clear all elements from assignedSectionsArray
+
     addEntityButton.removeEventListener('click', wakeAddEntityButton);
-    assignSectionButton.removeEventListener('click', () => assignSectionHandler(assignedSectionsArray), { once: true });
-    removeSectionButton.removeEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray), { once: true });
+
+    console.log("Inside add professor form handler");
 }
+
 
 
 
@@ -422,41 +438,54 @@ function addProfessorFormHandler(addProfessorFormHandlerEvent, assignedSectionsA
 
 //This function will wake assignSection button inside the add professor modal
 function wakeAssignSectionButton(assignedSectionsArray) {
-    assignSectionButton.addEventListener('click', () => assignSectionHandler(assignedSectionsArray), {once : true});
+    assignSectionButton.addEventListener('click', () => {
+        clearTimeout(debounceTimeout); // Clear any previous timeout
+        debounceTimeout = setTimeout(() => {
+            assignSectionHandler(assignedSectionsArray);
+        }, 300); // Adjust delay as needed
+    });
 }
 function assignSectionHandler(assignedSectionsArray) {
     assignSectionModal.style.display = "flex";
 
-    assignSectionForm.addEventListener('submit', (assignSectionFormHandlerEvent) => assignSectionFormHandler(assignSectionFormHandlerEvent, assignedSectionsArray));
+    // Add a one-time event listener for the form submit
+    assignSectionForm.addEventListener('submit', (assignSectionFormHandlerEvent) => {
+        assignSectionFormHandler(assignSectionFormHandlerEvent, assignedSectionsArray);
+    }, { once: true });
 
+    // Add a click listener for the close button
     document.querySelector('.assign-section-modal-close-container').addEventListener('click', function () {
         assignSectionModal.style.display = "none";
 
-        assignSectionButton.removeEventListener('click', () => assignSectionHandler(assignedSectionsArray), {once : true});
+        // Clean up event listeners
+        assignSectionButton.removeEventListener('click', () => assignSectionHandler(assignedSectionsArray));
         assignSectionForm.removeEventListener('submit', (assignSectionFormHandlerEvent) => assignSectionFormHandler(assignSectionFormHandlerEvent, assignedSectionsArray));
     });
 
-    assignSectionButton.removeEventListener('click', () => assignSectionHandler(assignedSectionsArray), {once : true});
-    wakeAssignSectionButton();
-
     console.log("Inside assign section modal");
 }
+
 function assignSectionFormHandler(assignSectionFormHandlerEvent, assignedSectionsArray) {
     const assignedSection = assignSectionForm.section_to_be_assigned.value;
 
-    if(assignedSection !== "") {
+    if (assignedSection !== "") {
         assignSectionFormHandlerEvent.stopPropagation();
         assignSectionFormHandlerEvent.preventDefault();
         assignSectionForm.reset();
-        
+
+        // Check for duplicates in the array
+        if (assignedSectionsArray.includes(assignedSection)) {
+            throw new Error(`Section "${assignedSection}" is already assigned.`);
+        }
+
         assignedSectionsArray.push(assignedSection);
 
         initializeAssignedSectionsArray(assignedSectionsArray);
 
-        assignSectionForm.removeEventListener('submit', (assignSectionFormHandlerEvent) => assignSectionFormHandler(assignSectionFormHandlerEvent, assignedSectionsArray));
         assignSectionModal.style.display = "none";
 
-        console.log("Section pushed in array");
+        console.log("Section pushed into the array successfully");
+        console.log(assignedSection);
     }
 }
 //End
@@ -467,7 +496,12 @@ function assignSectionFormHandler(assignSectionFormHandlerEvent, assignedSection
 
 //This function will wake the remove section button inside the add professor modal.
 function wakeRemoveSectionButton(assignedSectionsArray) {
-    removeSectionButton.addEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray), {once : true});
+    removeSectionButton.addEventListener('click', () => {
+        clearTimeout(debounceTimeout); // Clear any previous timeout
+        debounceTimeout = setTimeout(() => {
+            removeSectionButtonHandler(assignedSectionsArray);
+        }, 300); // Adjust delay as needed
+    });
 }
 function removeSectionButtonHandler(assignedSectionsArray) {
     removeSectionModal.style.display = "flex";
@@ -478,10 +512,9 @@ function removeSectionButtonHandler(assignedSectionsArray) {
         removeSectionModal.style.display = "none";
 
         removeSectionForm.removeEventListener('submit', (removeSectionFormEvent) => removeSectionFormHandler(removeSectionFormEvent, assignedSectionsArray));
-        removeSectionButton.addEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray), {once : true});
     });
 
-    removeSectionButton.addEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray));
+    removeSectionButton.removeEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray), {once : true});
     wakeRemoveSectionButton();
 
     console.log("Inside remove section modal");
@@ -489,26 +522,24 @@ function removeSectionButtonHandler(assignedSectionsArray) {
 function removeSectionFormHandler(removeSectionFormHandler, assignedSectionsArray) {
     const sectionToRemove = removeSectionForm.section_to_remove.value;
 
-    if(sectionToRemove !== "") {
+    if (sectionToRemove !== "") {
         removeSectionFormHandler.preventDefault();
         removeSectionFormHandler.stopPropagation();
         removeSectionForm.reset();
 
         const index = assignedSectionsArray.indexOf(sectionToRemove);
-        
-        // If the section exists in the array, remove it
+
+        // Check if the section exists in the array
         if (index !== -1) {
-            assignedSectionsArray.splice(index, 1);  // This removes the section in place
+            // Remove the section from the array
+            assignedSectionsArray.splice(index, 1);
             initializeAssignedSectionsArray(assignedSectionsArray);
             console.log("Section removed successfully");
         } else {
-            console.log("Section not found in the array");
+            // Throw an error if the section does not exist
+            throw new Error(`Section "${sectionToRemove}" does not exist in the assigned sections array.`);
         }
-
-        removeSectionForm.removeEventListener('submit', (removeSectionFormEvent) => removeSectionFormHandler(removeSectionFormEvent, assignedSectionsArray));
         removeSectionModal.style.display = "none";
-
-        console.log("Section removed successfully");
     }
 }
 //End
@@ -522,7 +553,6 @@ function initializeAssignedSectionsArray(assignedSectionsArray) {
     assignedSectionsArray.forEach((sectionName) => {
         const section = createElementWithText('div', `<p>${sectionName}</p>`, 'add-professor-modal-section');
         assignedSectionsContainer.appendChild(section);
-
     });
 }
 
@@ -718,6 +748,8 @@ function addEntity() {
         addProfessorModal.style.display = "flex";
 
         addProfessorForm.addEventListener('submit', (addProfessorFormHandlerEvent) => addProfessorFormHandler(addProfessorFormHandlerEvent, assignedSectionsArray), {once : true});
+
+        // removeSectionButton.addEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray), {once : true});
 
         wakeAssignSectionButton(assignedSectionsArray);
         wakeRemoveSectionButton(assignedSectionsArray);
