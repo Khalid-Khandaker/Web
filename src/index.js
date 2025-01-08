@@ -2,8 +2,8 @@
 import { getProfessorDetails, addSection, signOutUser, 
     getAssignedStudents, deleteSection, updateClassSectionName,
     getProfessorTableDocuments, getClassSectionTableDocuments, addCreateProfessor,
-    updateProfessorHandledSections, getProfessorHandledSections, deleteProfessor,
-    getStudentTableDocuments, createStudentAccount, getStudentData
+    updateProfessorHandledSections, getProfessorHandledSections, deleteProfessorRecords,
+    getStudentTableDocuments, createStudentAccount, getStudentData, deleteStudent, updateStudentCredentials
 } from "./utils/firebase";
 
 //The array below are used to prevent click stacking.
@@ -11,6 +11,8 @@ let addEntityClicks = [];
 let deleteQueue = [];
 let renameQueue = [];
 let renameQueueOne = [];
+let deleteStudentQueue = [];
+let confirmStudentEditQueue = [];
 let debounceTimeout;
 
 //Start of Admin Home Initializing DOM Elements Block
@@ -64,6 +66,9 @@ const studentEmailInput = document.querySelector('#student-email-input');
 const studentIdNumberInput = document.querySelector('#student-idnumber-input');
 const studentSectionInput = document.querySelector('#student-section-input');
 const studentPasswordInput = document.querySelector('#student-password-input');
+const deleteStudentButton = document.querySelector('.edit-student-modal-delete-button');
+const confirmStudentEditButton = document.querySelector('.edit-student-modal-confirm-button');
+const editStudentForm = document.querySelector('.edit-student-form');
 //End of Student Table Modals
 
 //Start of Class Section Table Modals
@@ -101,7 +106,7 @@ function initializeHomepage() {
 
 //CLASS SECTION BLOCK
 function initializeClassSectionTable() {
-    classSectionTableDataContainer.innerHTML = ""; 
+    classSectionTableDataContainer.innerHTML = "";
     getClassSectionTableDocuments().then((sectionsData) => {
         sectionsData.forEach((sectionData) => {
             // Create the main container
@@ -229,6 +234,8 @@ function renameClassSectionFormHandler(renameClassSectionFormHandlerEvent, class
             console.log(message);
             
             initializeClassSectionTable();
+            initializeStudentTable();
+            initializeProfessorTable();
         });
         renameClassSectionModal.style.display = "none";
         editClassSectionModal.style.display = "none";
@@ -249,35 +256,38 @@ function editClassSectionModalDeleteButtonHandler(classSectionName) {
     if(deleteQueue.length == 1) {
         deleteSection(classSectionName).then((message) => {
             console.log(message);
+
             initializeClassSectionTable();
         })
         editClassSectionModal.style.display = "none";
         classSectionTableDataContainer.removeEventListener('click', classSectionTableDataContainerHandler);
+
         wakeClassSectionTableDataContainer();
     }
     deleteQueue.pop();
 }
 //END OF CLASS SECTION BLOCK
 
+
+
+
 //STUDENT BLOCK
 function initializeStudentTable() {
     studentTableDataContainer.innerHTML = "";
 
-    getStudentTableDocuments()
-        .then((studentsData) => {
-            studentsData.forEach((studentData) => {
-                const studentTableData = createElementWithText('div', '', 'student-table-data');
+    getStudentTableDocuments().then((studentsData) => {
+        studentsData.forEach((studentData) => {
+            const studentTableData = createElementWithText('div', '', 'student-table-data');
                 
-                studentTableData.appendChild(createElementWithText('div', `<p>${studentData.idNum}</p>`, 'student-id-container'));
-                studentTableData.appendChild(createElementWithText('div', `<p>${studentData.name}</p>`, 'student-name-container'));
-                studentTableData.appendChild(createElementWithText('div', `<p>${studentData.section}</p>`, 'student-section-container'));
-
-                studentTableDataContainer.appendChild(studentTableData); 
-            });
-        })
-        .catch((error) => {
-            console.error("Failed to initialize student table:", error);
+            studentTableData.appendChild(createElementWithText('div', `<p>${studentData.idNum}</p>`, 'student-id-container'));
+            studentTableData.appendChild(createElementWithText('div', `<p>${studentData.name}</p>`, 'student-name-container'));
+            studentTableData.appendChild(createElementWithText('div', `<p>${studentData.section}</p>`, 'student-section-container'));
+            
+            studentTableDataContainer.appendChild(studentTableData); 
         });
+    }).catch((error) => {
+        console.error("Failed to initialize student table:", error);
+    });
 }
 
 
@@ -288,6 +298,8 @@ function wakeStudentNavigationButton() {
     studentNavigationButton.addEventListener('click', studentNavigationButtonHandler);
 } 
 function studentNavigationButtonHandler() {
+    initializeStudentTable();
+
     document.querySelector('.sections-text-container > p').style.setProperty('--after-background', 'transparent');
     document.querySelector('.professors-text-container > p').style.setProperty('--after-background', 'transparent');
     document.querySelector('.students-text-container > p').style.setProperty('--after-background', '#ad1f48');
@@ -299,17 +311,17 @@ function studentNavigationButtonHandler() {
     wakeAddEntityButton("student");
 
     studentNavigationButton.removeEventListener('click', studentNavigationButtonHandler);
+
     wakeStudentNavigationButton();
 }
 
 
 
-
+//This function will display student modal once its row is clicked.
 function wakeStudentTableDataContainer() {
     studentTableDataContainer.addEventListener('click', (studentTableDataContainerEvent) => studentTableDataContainerHandler(studentTableDataContainerEvent));
 }
 function studentTableDataContainerHandler(studentTableDataContainerEvent) {
-    studentTableDataContainerEvent.preventDefault();
     const studentId = studentTableDataContainerEvent.target.querySelector('.student-id-container').textContent;
 
     getStudentData(studentId).then((studentDataArray) => {
@@ -336,10 +348,65 @@ function studentTableDataContainerHandler(studentTableDataContainerEvent) {
     });
 
     //Wake delete account button
-    //Wake Update button 
+    wakeDeleteStudentButton(studentId);
 
-
+    //Wake Confirm Update button 
+    wakeConfirmStudentEditButton(studentId);
 }
+
+function wakeDeleteStudentButton(studentId) {
+    deleteStudentButton.addEventListener('click', () => deleteStudentButtonHandler(studentId)), {once : true};
+    deleteStudentQueue.push(studentId);
+}
+function deleteStudentButtonHandler(studentId) {
+    if(deleteStudentQueue.length == 1) {
+        deleteStudent(studentId).then((message) => {
+            console.log("Error Message: " + message);
+
+            initializeStudentTable();
+        }); 
+
+        editStudentModal.style.display = "none";
+        studentTableDataContainer.removeEventListener('click', (studentTableDataContainerEvent) => studentTableDataContainerHandler(studentTableDataContainerEvent));
+
+        wakeStudentTableDataContainer();
+    }
+    deleteStudentQueue.pop();
+}
+
+
+
+
+
+function wakeConfirmStudentEditButton(studentId) {
+    editStudentForm.addEventListener('submit', (editStudentFormHandler) => confirmStudentEditButtonHandler(editStudentFormHandler, studentId), {once : true});
+    confirmStudentEditQueue.push(studentId);
+}
+function confirmStudentEditButtonHandler(editStudentFormHandler, studentId) {
+    editStudentFormHandler.preventDefault();
+
+    if(confirmStudentEditQueue.length == 1) {
+        const studentName = editStudentForm.name.value;
+        const studentSection = editStudentForm.section.value;
+
+        updateStudentCredentials(studentId, studentName, studentSection).then((message) => {
+            editStudentForm.reset();
+
+            editStudentModal.style.display = "none"; 
+
+            console.log(message);
+
+            initializeStudentTable();
+        });
+        studentTableDataContainer.removeEventListener('click', (studentTableDataContainerEvent) => studentTableDataContainerHandler(studentTableDataContainerEvent));
+
+        wakeStudentTableDataContainer();
+    }
+    confirmStudentEditQueue.pop();
+}
+
+
+
 //END OF STUDENT BLOCK
 
 
@@ -362,7 +429,7 @@ function initializeProfessorTable() {
                 });
             } else {
                 // Display a default message if no handled sections are found
-                professorHandledSection.appendChild(createElementWithText('div', `<p>No Handled Sections</p>`, 'no-handled-sections'));
+                professorHandledSection.appendChild(createElementWithText('div', `<p>No Handled Sections</p>`, 'handled-section'));
             }
 
             professorTableData.appendChild(professorHandledSection);
@@ -379,6 +446,8 @@ function wakeProfessorNavigationButton() {
     professorNavigationButton.addEventListener('click', professorNavigationButtonHandler);
 } 
 function professorNavigationButtonHandler() {
+    initializeProfessorTable();
+
     document.querySelector('.students-text-container > p').style.setProperty('--after-background', 'transparent');
     document.querySelector('.professors-text-container > p').style.setProperty('--after-background', '#ad1f48');
     document.querySelector('.sections-text-container > p').style.setProperty('--after-background', 'transparent');
@@ -405,32 +474,24 @@ function addProfessorFormHandler(addProfessorFormHandlerEvent, assignedSectionsA
 
     addCreateProfessor(professorName, professorEmail, professorPassword, assignedSectionsArray).then((message) => {
         initializeProfessorTable();
-        
+
         addProfessorForm.reset();
-
         assignedSectionsContainer.innerHTML = "";
-
         addProfessorModal.style.display = "none";
 
         console.log(message);
     })
     .catch((error) => {
-        console.error("Error:", error.message);
-
         addProfessorForm.reset();
-
         assignedSectionsContainer.innerHTML = "";
-
         addProfessorModal.style.display = "none";
-    });
-    // Clear all elements from assignedSectionsArray
 
+        console.error("Error:", error.message);
+    });
     addEntityButton.removeEventListener('click', wakeAddEntityButton);
 
     console.log("Inside add professor form handler");
 }
-
-
 
 
 
@@ -506,25 +567,24 @@ function wakeRemoveSectionButton(assignedSectionsArray) {
 function removeSectionButtonHandler(assignedSectionsArray) {
     removeSectionModal.style.display = "flex";
 
-    removeSectionForm.addEventListener('submit', (removeSectionFormEvent) => removeSectionFormHandler(removeSectionFormEvent, assignedSectionsArray));
+    removeSectionForm.addEventListener('submit', (removeSectionFormEvent) => {
+        removeSectionFormHandler(removeSectionFormEvent, assignedSectionsArray);
+    }, { once: true });
 
     document.querySelector('.remove-section-modal-close-container').addEventListener('click', function () {
         removeSectionModal.style.display = "none";
 
-        removeSectionForm.removeEventListener('submit', (removeSectionFormEvent) => removeSectionFormHandler(removeSectionFormEvent, assignedSectionsArray));
+        removeSectionButton.removeEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray));
+        removeSectionForm.removeEventListener('submit', (removeSectionFormHandlerEvent) => removeSectionFormHandler(removeSectionFormHandlerEvent, assignedSectionsArray));
     });
-
-    removeSectionButton.removeEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray), {once : true});
-    wakeRemoveSectionButton();
-
     console.log("Inside remove section modal");
 }
-function removeSectionFormHandler(removeSectionFormHandler, assignedSectionsArray) {
+function removeSectionFormHandler(removeSectionFormHandlerEvent, assignedSectionsArray) {
     const sectionToRemove = removeSectionForm.section_to_remove.value;
 
     if (sectionToRemove !== "") {
-        removeSectionFormHandler.preventDefault();
-        removeSectionFormHandler.stopPropagation();
+        removeSectionFormHandlerEvent.preventDefault();
+        removeSectionFormHandlerEvent.stopPropagation();
         removeSectionForm.reset();
 
         const index = assignedSectionsArray.indexOf(sectionToRemove);
@@ -547,7 +607,6 @@ function removeSectionFormHandler(removeSectionFormHandler, assignedSectionsArra
 
 
 
-
 function initializeAssignedSectionsArray(assignedSectionsArray) {
     assignedSectionsContainer.innerHTML = "";
     assignedSectionsArray.forEach((sectionName) => {
@@ -558,150 +617,75 @@ function initializeAssignedSectionsArray(assignedSectionsArray) {
 
 
 
-
+//You are currently here! (Not Finish);
 //This function listens to professor table data clicks and display edit modal.
 function wakeProfessorTableDataContainer() {
     professorTableDataContainer.addEventListener('click', professorTableDataContainerHandler);
+    console.log("> Inside wakeProfessorTableDataContainer Function");
 }
 function professorTableDataContainerHandler(professorTableDataContainerHandlerEvent) {
     const professorName = professorTableDataContainerHandlerEvent.target.querySelector('.professor-name-container').textContent;
-    editProfessorHeader.innerHTML = `<p>Editing ${professorName} Account</p>`;
+
+    editProfessorHeader.innerHTML = `<p>${professorName} Handled Sections</p>`;
     handledSectionsContainer.innerHTML = "";
 
     let assignedSectionsArray = [];
 
-    getProfessorHandledSections(professorName).then((handledSectionsName) => {
-        handledSectionsName.forEach((sectionName) => {
-            assignedSectionsArray.push(sectionName);
+    editProfessorModal.style.display = "flex";
 
-            const sectionContainer = createElementWithText('div', `<p>${sectionName}</p>` ,'edit-professor-modal-section');
+    getProfessorHandledSections(professorName).then((handledSectionsName) => {
+        if(handledSectionsName == "") {
+            const sectionContainer = createElementWithText('div', `<p> No Handled Section </p>` ,'edit-professor-modal-section');
             handledSectionsContainer.appendChild(sectionContainer);
-        });
-        editProfessorModal.style.display = "flex";
+        } else {
+            handledSectionsName.forEach((sectionName) => {
+                assignedSectionsArray.push(sectionName);
+    
+                const sectionContainer = createElementWithText('div', `<p>${sectionName}</p>` ,'edit-professor-modal-section');
+                handledSectionsContainer.appendChild(sectionContainer);
+            });
+        }
     });
 
     document.querySelector('.edit-professor-modal-close-container').addEventListener('click', function () {
-        deleteHandledSectionButton.removeEventListener('click', () => deleteHandledSectionButtonHandler(assignedSectionsArray, professorName));
-        addHandledSectionButton.removeEventListener('click', () => addHandledSectionButtonHandler(assignedSectionsArray, professorName));
         professorTableDataContainer.removeEventListener('click', professorTableDataContainerHandler);
-        deleteProfessorButton.removeEventListener('click', () => deleteProfessorButtonHandler(professorName));
-        confirmEditProfessorButton.removeEventListener('click', () => wakeConfirmEditProfessorButtonHandler(assignedSectionsArray, professorName));
 
         editProfessorModal.style.display = "none";
 
         wakeProfessorTableDataContainer();
     });
 
-    wakeAddSectionButton(assignedSectionsArray, professorName);
-    wakeDeleteSectionButton(assignedSectionsArray, professorName);
+    wakeAddSectionButton(assignedSectionsArray);
+    wakeDeleteSectionButton(assignedSectionsArray);
 
-    wakeDeleteProfessorButton(professorName);
+    wakeDeleteProfessorButton(professorName);//Refer to notepad about the implementation of this button function.
     wakeConfirmEditProfessorButton(assignedSectionsArray, professorName);
 }
 
 
 
 
-function wakeConfirmEditProfessorButton(assignedSectionsArray, professorName) {
-    confirmEditProfessorButton.addEventListener('click', () => wakeConfirmEditProfessorButtonHandler(assignedSectionsArray, professorName));
-}
-function wakeConfirmEditProfessorButtonHandler(assignedSectionsArray, professorName) {
-    deleteHandledSectionButton.removeEventListener('click', () => deleteHandledSectionButtonHandler(assignedSectionsArray, professorName));
-    addHandledSectionButton.removeEventListener('click', () => addHandledSectionButtonHandler(assignedSectionsArray, professorName));
-    professorTableDataContainer.removeEventListener('click', professorTableDataContainerHandler);
-    deleteProfessorButton.removeEventListener('click', () => deleteProfessorButtonHandler(professorName));
-    confirmEditProfessorButton.removeEventListener('click', () => wakeConfirmEditProfessorButtonHandler(assignedSectionsArray, professorName));
-
-    updateProfessorHandledSections(professorName, assignedSectionsArray).then((message) => {
-        console.log(message);
-
-        initializeProfessorTable();
-        editProfessorModal.style.display = "none";
+//This function will add additional section to already existing professors. 
+function wakeAddSectionButton(assignedSectionsArray) {
+    addHandledSectionButton.addEventListener('click', () => {
+        clearTimeout(debounceTimeout); // Clear any previous timeout
+        debounceTimeout = setTimeout(() => {
+            addHandledSectionButtonHandler(assignedSectionsArray);
+        }, 300); // Adjust delay as needed
     });
-    wakeProfessorTableDataContainer();
 }
-
-
-
-
-function wakeDeleteProfessorButton(professorName) {
-    deleteProfessorButton.addEventListener('click', () => deleteProfessorButtonHandler(professorName));
-}
-function deleteProfessorButtonHandler(professorName) {
-    deleteProfessor(professorName).then((message) => {
-        deleteHandledSectionButton.removeEventListener('click', () => deleteHandledSectionButtonHandler(assignedSectionsArray, professorName));
-        addHandledSectionButton.removeEventListener('click', () => addHandledSectionButtonHandler(assignedSectionsArray, professorName));
-        professorTableDataContainer.removeEventListener('click', professorTableDataContainerHandler);
-        deleteProfessorButton.removeEventListener('click', () => deleteProfessorButtonHandler(professorName));
-        confirmEditProfessorButton.removeEventListener('click', () => wakeConfirmEditProfessorButtonHandler(assignedSectionsArray, professorName));
-
-        editProfessorModal.style.display = "none";
-    })
-}
-
-
-
-
-function wakeDeleteSectionButton(assignedSectionsArray, professorName) {
-    deleteHandledSectionButton.addEventListener('click', () => deleteHandledSectionButtonHandler(assignedSectionsArray, professorName));
-}
-function deleteHandledSectionButtonHandler(assignedSectionsArray, professorName) {
-    deleteSectionModal.style.display = "flex";
-
-    document.querySelector('.delete-section-modal-close-container').addEventListener('click', function() {
-        deleteSectionModal.style.display = "none";  
-    });
-
-    deleteSectionForm.addEventListener('submit', (deleteSectionFormEvent) => deleteSectionFormHandler(deleteSectionFormEvent, assignedSectionsArray, professorName));
-
-    deleteHandledSectionButton.removeEventListener('click', () => deleteHandledSectionButtonHandler(assignedSectionsArray, professorName));
-    wakeDeleteSectionButton();
-}
-function deleteSectionFormHandler(deleteSectionFormEvent, assignedSectionsArray, professorName) {
-    handledSectionsContainer.innerHTML = "";
-
-    deleteSectionFormEvent.preventDefault();
-    deleteSectionFormEvent.stopPropagation();
-
-    const sectionToBeDeleted = deleteSectionForm.section_to_be_deleted.value;
-
-    const indexToDelete = assignedSectionsArray.indexOf(sectionToBeDeleted);
-    if (indexToDelete > -1) {
-        assignedSectionsArray.splice(indexToDelete, 1);
-    }
-
-    assignedSectionsArray.forEach((handledSection) => {
-        const sectionContainer = createElementWithText('div', `<p>${handledSection}</p>`, 'edit-professor-modal-section');
-        handledSectionsContainer.appendChild(sectionContainer);
-    });
-
-    deleteSectionForm.removeEventListener('submit', deleteSectionFormHandler);
-    deleteSectionModal.style.display = "none";
-}
-
-
-
-
-
-
-function wakeAddSectionButton(assignedSectionsArray, professorName) {
-    addHandledSectionButton.addEventListener('click', () => addHandledSectionButtonHandler(assignedSectionsArray, professorName));
-}
-function addHandledSectionButtonHandler(assignedSectionsArray, professorName) {
+function addHandledSectionButtonHandler(assignedSectionsArray) {
     addSectionModal.style.display = "flex";
 
+    addSectionForm.addEventListener('submit', (addSectionFormEvent) => {
+        addSectionFormHandler(addSectionFormEvent, assignedSectionsArray);
+    }, { once: true });
+    
     document.querySelector('.add-section-modal-close-container').addEventListener('click', function() {
         addSectionModal.style.display = "none";
     });
-
-    addSectionForm.addEventListener('submit', (addSectionFormEvent) => addSectionFormHandler(addSectionFormEvent, assignedSectionsArray, professorName));
-
-    addHandledSectionButton.removeEventListener('click', () => addHandledSectionButtonHandler(assignedSectionsArray, professorName));
-    wakeAddSectionButton(assignedSectionsArray, professorName);
 }
-function addSectionFormHandler(addSectionFormEvent, assignedSectionsArray, professorName) {
-    handledSectionsContainer.innerHTML = "";
-
+function addSectionFormHandler(addSectionFormEvent, assignedSectionsArray) {
     addSectionFormEvent.preventDefault();
     addSectionFormEvent.stopPropagation();
 
@@ -709,17 +693,110 @@ function addSectionFormHandler(addSectionFormEvent, assignedSectionsArray, profe
 
     if (!assignedSectionsArray.includes(sectionToAdd)) {
         assignedSectionsArray.push(sectionToAdd);
-    } else {
-        //Error message here
-    }
+        addSectionForm.reset();
 
-    assignedSectionsArray.forEach((handledSection) => {
-        const sectionContainer = createElementWithText('div', `<p>${handledSection}</p>` ,'edit-professor-modal-section');
-        handledSectionsContainer.appendChild(sectionContainer);
+        loadProfessorHandledSections(assignedSectionsArray);
+    } else {
+        console.log("Cannot push section in array");
+    }
+    addSectionModal.style.display = "none";
+}
+//End
+
+
+
+
+
+//This function will remove section to already existing professor.
+function wakeDeleteSectionButton(assignedSectionsArray) {
+    deleteHandledSectionButton.addEventListener('click', () => {
+        clearTimeout(debounceTimeout); // Clear any previous timeout
+        debounceTimeout = setTimeout(() => {
+            deleteHandledSectionButtonHandler(assignedSectionsArray);
+        }, 300); // Adjust delay as needed
+    });
+}
+function deleteHandledSectionButtonHandler(assignedSectionsArray) {
+    deleteSectionModal.style.display = "flex";
+
+    document.querySelector('.delete-section-modal-close-container').addEventListener('click', function() {
+        deleteSectionModal.style.display = "none";  
+
+        deleteHandledSectionButton.removeEventListener('click', () => deleteHandledSectionButtonHandler(assignedSectionsArray));
     });
 
-    deleteSectionForm.removeEventListener('submit', (addSectionFormEvent) => addSectionFormHandler(addSectionFormEvent, assignedSectionsArray, professorName));
-    addSectionModal.style.display = "none";
+    deleteSectionForm.addEventListener('submit', (deleteSectionFormEvent) => {
+        deleteSectionFormHandler(deleteSectionFormEvent, assignedSectionsArray);
+    }, { once: true });
+}
+function deleteSectionFormHandler(deleteSectionFormEvent, assignedSectionsArray) {
+    deleteSectionFormEvent.preventDefault();
+    deleteSectionFormEvent.stopPropagation();
+
+    const sectionToBeDeleted = deleteSectionForm.section_to_be_deleted.value;
+
+    const indexToDelete = assignedSectionsArray.indexOf(sectionToBeDeleted);
+
+    if (indexToDelete > -1) {
+        assignedSectionsArray.splice(indexToDelete, 1);
+
+        loadProfessorHandledSections(assignedSectionsArray);
+    } else {
+        console.log("Section to be deleted not found");
+    }
+
+    deleteSectionForm.reset();
+
+    deleteSectionModal.style.display = "none";
+}
+//End
+
+
+
+
+
+// This function will delete professor and its associated records in the database.
+function wakeDeleteProfessorButton(professorName) {
+    deleteProfessorButton.addEventListener('click', () => deleteProfessorButtonHandler(professorName), {once : true});
+}
+function deleteProfessorButtonHandler(professorName) {
+    deleteProfessorRecords(professorName).then(() => {
+        editProfessorModal.style.display = "none";
+        initializeProfessorTable();
+    })
+}
+//End
+
+
+
+
+//This function will update professor handled sections.
+function wakeConfirmEditProfessorButton(assignedSectionsArray, professorName) {
+    confirmEditProfessorButton.addEventListener('click', () => confirmEditProfessorButtonHandler(assignedSectionsArray, professorName), {once : true});
+    console.log("> Inside wakeConfirmEditProfessorButton");
+}
+function confirmEditProfessorButtonHandler(assignedSectionsArray, professorName) {
+    updateProfessorHandledSections(professorName, assignedSectionsArray).then((message) => {
+        initializeProfessorTable();  
+        
+        editProfessorModal.style.display = "none";
+        
+        console.log(message);
+    });
+    
+}
+//End
+
+
+
+
+
+function loadProfessorHandledSections(assignedSectionsArray) {
+    handledSectionsContainer.innerHTML = "";
+    assignedSectionsArray.forEach((sectionName) => {
+        const sectionContainer = createElementWithText('div', `<p>${sectionName}</p>` ,'edit-professor-modal-section');
+        handledSectionsContainer.appendChild(sectionContainer);
+    });
 }
 //END OF PROFESSOR BLOCK 
 
@@ -749,8 +826,6 @@ function addEntity() {
 
         addProfessorForm.addEventListener('submit', (addProfessorFormHandlerEvent) => addProfessorFormHandler(addProfessorFormHandlerEvent, assignedSectionsArray), {once : true});
 
-        // removeSectionButton.addEventListener('click', () => removeSectionButtonHandler(assignedSectionsArray), {once : true});
-
         wakeAssignSectionButton(assignedSectionsArray);
         wakeRemoveSectionButton(assignedSectionsArray);
         
@@ -769,9 +844,11 @@ function addEntity() {
             addClassSectionModal.style.display = "none"; 
         });
     } else if(addEntityClicks[addEntityClicks.length - 1] == "student") {
+        addStudentForm.addEventListener('submit', addStudentFormHandler);
         addStudentModal.style.display = "flex";
 
-        addStudentForm.addEventListener('submit', (addStudentFormEvent) => addStudentFormHandler(addStudentFormEvent));
+        console.log("Inside add student modal");
+
 
         document.querySelector('.add-student-modal-close-container').addEventListener('click', function() {
             addStudentModal.style.display = "none";
@@ -785,7 +862,6 @@ function addEntity() {
 
 function addStudentFormHandler(addStudentFormEvent) {
     addStudentFormEvent.preventDefault();
-    addStudentFormEvent.stopPropagation();
 
     const studentIdNumber = addStudentForm.student_id_number.value;
     const studentName =  addStudentForm.student_name.value;
@@ -796,13 +872,18 @@ function addStudentFormHandler(addStudentFormEvent) {
     createStudentAccount(studentIdNumber, studentName, studentEmail, studentPassword, studentSection).then((message) => {
         initializeStudentTable();
         addStudentForm.reset();
-        addStudentModal.style = "none";
+
+        addStudentModal.style.display = "none";
+
+        console.log(message);
     });
 
-    addStudentForm.removeEventListener('submit', (addStudentFormEvent) => addStudentFormHandler(addStudentFormEvent));
+    addStudentForm.removeEventListener('submit', addStudentFormHandler);
     addEntityButton.removeEventListener('click', wakeAddEntityButton);
 
     wakeAddEntityButton("student");
+
+    console.log("Inside student form processing");
 }
 
 
@@ -821,3 +902,8 @@ if (logoutButton) {
         });
     }, {once : true});// Automatically reset event listeners once the session ends.
 }
+
+
+//Note:
+// Editing professor account must include name changing.
+// --- --- ---

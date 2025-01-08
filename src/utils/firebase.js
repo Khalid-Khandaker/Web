@@ -27,7 +27,13 @@ const app = initializeApp(firebaseAppConfig);
 const database = getFirestore(app);
 const authentication = getAuth(app);
 
+//Global variables 
+let oldClassSectionNameTwo = "";//Used for renaming class section.
+let assignedToVariable = "";//Used for deleting class section.
+let sectionBeingDeleted = ""//Used for deleting class section.
+let studentsEnrolledInSection = []; // Array to store names of students
 
+//Create a map that will store the enrolled students name for easy lookup
 
 
 
@@ -51,13 +57,14 @@ export const signIn = async (email, password) => {
 
 
 
-
-//This function is used to update class section name inside class sections collection.
+//This function updates class section document name inside the classSections collection.(Checked)
 export const updateClassSectionName = async (oldClassSectionName, newClassSectionName) => {
     const sectionsCollectionReference = collection(database, "classSections");
     const sectionsQuery = query(sectionsCollectionReference, where("name", "==", oldClassSectionName));
     
     const sectionsSnapShot = await getDocs(sectionsQuery);
+
+    oldClassSectionNameTwo = oldClassSectionName; 
 
     if (sectionsSnapShot.empty) {
         throw new Error(`No document found with name: ${oldClassSectionName}`);
@@ -78,9 +85,7 @@ export const updateClassSectionName = async (oldClassSectionName, newClassSectio
 
 
 
-
-//Pwede na pag isahin sa isang function
-//Subscribe snapshot to students subcollection and return their data
+//This function returns all students enrolled in a specified section by accessing the students subcollection on classSections collection.(Checked)
 export const getAssignedStudents = async (classSectionName) => { 
     let assignedStudentsArray = [];
     
@@ -120,33 +125,58 @@ export const getAssignedStudents = async (classSectionName) => {
 
 
 
+// This function is used to delete a class section document inside the classSections collection
 
-//This function is used to delete class section document inside classSections collection
 export const deleteSection = async (classSectionName) => {
-    const sectionsCollectionReference = collection(database, "classSections");
-    const sectionsQuery = query(sectionsCollectionReference, where("name", "==", classSectionName));
-    const sectionsSnapShot = await getDocs(sectionsQuery);
-    
-    if (sectionsSnapShot.empty) {
-        throw new Error("Document not found. Deletion cannot proceed.");
+    try {
+        const sectionsCollectionReference = collection(database, "classSections");
+        const sectionsQuery = query(sectionsCollectionReference, where("name", "==", classSectionName));
+        const sectionsSnapShot = await getDocs(sectionsQuery);
+
+        sectionBeingDeleted = classSectionName;
+
+        if (sectionsSnapShot.empty) {
+            throw new Error("Document not found. Deletion cannot proceed.");
+        }
+
+        // Retrieve the document's data before deleting
+        const sectionDoc = sectionsSnapShot.docs[0];
+        const sectionData = sectionDoc.data();
+
+        // Assign the value of "assignedTo" to the variable
+        assignedToVariable = sectionData.assignedTo || "No value assigned"; // Default if no value exists
+        console.log(`AssignedTo retrieved: ${assignedToVariable}`);
+
+        // Access the students subcollection and store student names
+        const studentsSubcollectionRef = collection(sectionDoc.ref, "students");
+        const studentsSnapShot = await getDocs(studentsSubcollectionRef);
+
+        if (!studentsSnapShot.empty) {
+            studentsEnrolledInSection = studentsSnapShot.docs.map(studentDoc => studentDoc.data().name);
+            console.log(`Students enrolled in section "${classSectionName}":`, studentsEnrolledInSection);
+        } else {
+            console.log(`No students enrolled in section "${classSectionName}".`);
+        }
+
+        // Proceed with the deletion
+        await deleteDoc(doc(database, "classSections", sectionDoc.id));
+        console.log(`Section "${classSectionName}" deleted successfully.`);
+    } catch (error) {
+        console.error(`Error deleting section: ${error.message}`);
     }
+};
 
-    await deleteDoc(doc(database, "classSections", sectionsSnapShot.docs[0].id));
-
-    return "Document deleted successfully";
-};      
+      
 
 
 
 
 
-
-//This function is used to create professor account and add professor document to professors collection.
+//This function creates professor document inside the professors collection and creates a subcollection called handledSections.(Assumed Correct)
 export const addCreateProfessor = async (professorName, professorEmail, professorPassword, assignedSectionsArray) => {
     try {
-        // Ensure all sections are valid before proceeding to professor creation
+        // Validate and process assigned sections
         for (const sectionName of assignedSectionsArray) {
-            // Check if the section exists in the classSections collection
             const sectionQuery = query(
                 collection(database, "classSections"),
                 where("name", "==", sectionName)
@@ -154,21 +184,18 @@ export const addCreateProfessor = async (professorName, professorEmail, professo
             const sectionQuerySnapshot = await getDocs(sectionQuery);
 
             if (sectionQuerySnapshot.empty) {
-                // If the section does not exist, throw an error and stop
                 throw new Error(`Section "${sectionName}" does not exist in the classSections collection.`);
             }
 
-            // Check if the section is already assigned
             const sectionDoc = sectionQuerySnapshot.docs[0];
             const assignedTo = sectionDoc.data().assignedTo;
 
             if (assignedTo && assignedTo !== "No professor assigned") {
-                // If the section is already assigned to someone else, throw an error
                 throw new Error(`Section "${sectionName}" is already assigned to another professor.`);
             }
         }
 
-        // Create the professor only if all section checks pass
+        // Create a professor
         const userCredential = await createUserWithEmailAndPassword(authentication, professorEmail, professorPassword);
         const user = userCredential.user;
         const professorUID = user.uid;
@@ -179,19 +206,14 @@ export const addCreateProfessor = async (professorName, professorEmail, professo
             userType: "professor"
         };
 
-        // Add professor document in the professors collection
         const professorDocRef = await addDoc(collection(database, "professors"), professorData);
 
-        // Only assign sections if assignedSectionsArray is not empty
         if (assignedSectionsArray.length > 0) {
-            // Reference to the handledSections subcollection
             const handledSectionsCollectionRef = collection(professorDocRef, "handledSections");
 
             for (const sectionName of assignedSectionsArray) {
-                // Add each section to the handledSections subcollection
                 await addDoc(handledSectionsCollectionRef, { name: sectionName });
 
-                // Update the assignedTo field in the classSections collection
                 const sectionDocQuery = query(
                     collection(database, "classSections"),
                     where("name", "==", sectionName)
@@ -204,7 +226,6 @@ export const addCreateProfessor = async (professorName, professorEmail, professo
             }
         }
 
-        // Add professor to the users collection
         const usersDocRef = doc(database, "users", professorDocRef.id);
         await setDoc(usersDocRef, professorData);
 
@@ -221,39 +242,208 @@ export const addCreateProfessor = async (professorName, professorEmail, professo
 
 
 
-
-
-
-
-
-
-
-//This function is used for adding class section document inside classSections collection.
+//This function creates a class section document inside the classSections collection and set live listener to each class section created.
 export const addSection = async (classSectionName) => {
     try {
         const classSectionsCollection = collection(database, "classSections");
+        
+        // Check if the class section already exists
         const sectionQuery = query(classSectionsCollection, where("name", "==", classSectionName));
         const querySnapshot = await getDocs(sectionQuery);
 
-        // Check if the class section already exists
         if (!querySnapshot.empty) {
             throw new Error(`Class section "${classSectionName}" already exists.`);
         }
 
         // Add the new class section document to the "classSections" collection
-        await addDoc(classSectionsCollection, {
+        const newSectionRef = await addDoc(classSectionsCollection, {
             name: classSectionName,
-            assignedTo: "No professor assigned"
+            assignedTo: "No professor assigned" // Default value
         });
 
+        console.log(`Class section "${classSectionName}" created successfully!`);
+
+        // Attach a real-time listener to the new document
+        addSectionListener(newSectionRef.id);
+
         return `Class section "${classSectionName}" created successfully!`;
+
     } catch (error) {
         console.error(`Error adding section: ${error.message}`);
         return `Error: ${error.message}`;
     }
 };
 
+// Function to listen for changes in the specific document. (Correct)
+const addSectionListener = (sectionId) => {
+    const sectionRef = doc(database, "classSections", sectionId);
 
+    let previousName = null; // This will store the old section name
+
+    // Add a real-time listener
+    onSnapshot(sectionRef, async (docSnapshot) => {
+        if (docSnapshot.exists()) {
+            const data = docSnapshot.data();
+            const currentName = data.name;
+
+            console.log(`Detected changes in section "${currentName}".`);
+
+            // Check if the section name has changed
+            if (previousName && previousName !== currentName) {
+                console.log("Section name has been renamed.");
+                
+                // Update users collection where the section field matches the old name
+                try {
+                    const usersCollection = collection(database, "users");
+                    const usersQuery = query(usersCollection, where("section", "==", previousName));
+                    const usersSnapshot = await getDocs(usersQuery);
+            
+                    if (!usersSnapshot.empty) {
+                        usersSnapshot.forEach(async (userDoc) => {
+                            const userRef = doc(database, "users", userDoc.id);
+                            await updateDoc(userRef, { section: currentName });
+                            console.log(`User "${userDoc.data().name}" section updated to "${currentName}" in the users collection.`);
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error updating users collection:", error.message);
+                }
+                
+                // Continue with the professor and student updates as in the original code
+                if (data.assignedTo && data.assignedTo !== "No professor assigned") {
+                    console.log(`Assigned professor: ${data.assignedTo}`);
+            
+                    try {
+                        // Query the professors collection to get the professor document
+                        const professorsCollection = collection(database, "professors");
+                        const professorQuery = query(professorsCollection, where("name", "==", data.assignedTo));
+                        const professorSnapshot = await getDocs(professorQuery);
+            
+                        if (!professorSnapshot.empty) {
+                            const professorDoc = professorSnapshot.docs[0];
+                            const professorRef = doc(database, "professors", professorDoc.id);
+            
+                            // Access the professor's handledSections subcollection
+                            const handledSectionsRef = collection(professorRef, "handledSections");
+                            const handledSectionQuery = query(handledSectionsRef, where("name", "==", previousName));
+                            const handledSectionSnapshot = await getDocs(handledSectionQuery);
+            
+                            if (!handledSectionSnapshot.empty) {
+                                const handledSectionDoc = handledSectionSnapshot.docs[0];
+                                const handledSectionDocRef = doc(handledSectionsRef, handledSectionDoc.id);
+            
+                                // Update the section name in the handledSections subcollection
+                                await updateDoc(handledSectionDocRef, { name: currentName });
+                                console.log(`Section name updated to "${currentName}" in professor's handledSections.`);
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Error updating handledSections:", error.message);
+                    }
+                }
+            }
+
+            // Update previousName to the current name for the next comparison
+            previousName = currentName;
+
+            // Check if students are enrolled in the section
+            try {
+                const studentsSubcollection = collection(sectionRef, "students");
+                const studentsSnapshot = await getDocs(studentsSubcollection);
+            
+                if (!studentsSnapshot.empty) {
+                    const studentNames = [];
+                    console.log(`Students are enrolled in section "${data.name}".`);
+            
+                    // Update the section field for each student in the subcollection
+                    for (const studentDoc of studentsSnapshot.docs) {
+                        const studentRef = doc(studentsSubcollection, studentDoc.id);
+                        await updateDoc(studentRef, { section: currentName });
+                        console.log(`Student "${studentDoc.data().name}" section updated to "${currentName}" in the subcollection.`);
+            
+                        // Collect student names for updating the main students collection
+                        studentNames.push(studentDoc.data().name);
+                    }
+            
+                    // Now update the main students collection with the new section name
+                    const studentsCollection = collection(database, "students");
+                    for (const studentName of studentNames) {
+                        const studentQuery = query(studentsCollection, where("name", "==", studentName));
+                        const studentSnapshot = await getDocs(studentQuery);
+            
+                        if (!studentSnapshot.empty) {
+                            for (const studentDoc of studentSnapshot.docs) {
+                                const studentRef = doc(studentsCollection, studentDoc.id);
+                                await updateDoc(studentRef, { section: currentName });
+                                console.log(`Student "${studentName}" section updated to "${currentName}" in the main collection.`);
+                            }
+                        }
+                    }
+                } else {
+                    console.log(`No students currently enrolled in section "${data.name}".`);
+                }
+            } catch (error) {
+                console.error("Error updating students subcollection and main collection:", error.message);
+            }
+
+        } else {
+            // Document has been deleted
+            console.log(`Section document with ID "${sectionId}" has been deleted.`);
+            try {
+                // Handle professors if assignedToVariable is valid
+                if (assignedToVariable !== "No value assigned") {
+                    const professorsCollection = collection(database, "professors");
+                    const professorQuery = query(professorsCollection, where("name", "==", assignedToVariable));
+                    const professorSnapshot = await getDocs(professorQuery);
+            
+                    if (!professorSnapshot.empty) {
+                        const professorDoc = professorSnapshot.docs[0];
+                        const professorRef = doc(database, "professors", professorDoc.id);
+                        const handledSectionsRef = collection(professorRef, "handledSections");
+            
+                        const handledSectionQuery = query(handledSectionsRef, where("name", "==", sectionBeingDeleted));
+                        const handledSectionSnapshot = await getDocs(handledSectionQuery);
+            
+                        if (!handledSectionSnapshot.empty) {
+                            const handledSectionDoc = handledSectionSnapshot.docs[0];
+                            const handledSectionDocRef = doc(handledSectionsRef, handledSectionDoc.id);
+            
+                            // Delete the section from the professor's handledSections subcollection
+                            await deleteDoc(handledSectionDocRef);
+                            console.log(`Section "${sectionBeingDeleted}" removed from professor's handled sections.`);
+                        } else {
+                            console.log("No matching section found in professor's handledSections.");
+                        }
+                    }
+                } else {
+                    console.log("No professor assigned. Skipping professor handling.");
+                }
+            
+                // Update students if studentsEnrolledInSection is not empty
+                if (studentsEnrolledInSection.length > 0) {
+                    for (const studentName of studentsEnrolledInSection) {
+                        const studentsCollection = collection(database, "students");
+                        const studentQuery = query(studentsCollection, where("name", "==", studentName));
+                        const studentSnapshot = await getDocs(studentQuery);
+            
+                        if (!studentSnapshot.empty) {
+                            for (const studentDoc of studentSnapshot.docs) {
+                                const studentRef = doc(studentsCollection, studentDoc.id);
+            
+                                await updateDoc(studentRef, { section: "No section assigned" });
+                                console.log(`Student "${studentName}" section updated to "No section assigned".`);
+                            }
+                        }
+                    }
+                } else {
+                    console.log("No students enrolled. Skipping student updates.");
+                }
+            } catch (error) {
+                console.error("Error handling section deletion:", error.message);
+            }
+        }
+    });
+};
 
 
 
@@ -418,93 +608,126 @@ export const updateProfessorHandledSections = async (professorName, assignedSect
         const professorSnapshot = await getDocs(professorQuery);
 
         if (professorSnapshot.empty) {
-            throw new Error(`Professor with name ${professorName} not found`);
+            throw new Error(`Professor with name ${professorName} not found.`);
         }
 
         const professorDocRef = professorSnapshot.docs[0].ref;
         const handledSectionsRef = collection(professorDocRef, "handledSections");
 
-        const currentSectionsSnapshot = await getDocs(handledSectionsRef);
-        const currentSections = new Map();
-        
-        currentSectionsSnapshot.forEach((doc) => {
-            const sectionName = doc.data().name;
-            currentSections.set(sectionName, doc.ref);
+        const handledSectionsSnapshot = await getDocs(handledSectionsRef);
+        const currentHandledSections = new Map();
+        handledSectionsSnapshot.forEach((doc) => {
+            const { name } = doc.data();
+            currentHandledSections.set(name, doc.ref);
         });
 
+        const classSectionsRef = collection(database, "classSections");
+        const classSectionsSnapshot = await getDocs(classSectionsRef);
+        const classSections = new Map();
+
+        classSectionsSnapshot.forEach((doc) => {
+            const { name, assignedTo } = doc.data();
+            classSections.set(name, { docRef: doc.ref, assignedTo });
+        });
+
+        const sectionsToAdd = [];
+        const sectionsToDelete = [];
+
         for (const sectionName of assignedSectionsArray) {
-            const trimmedSectionName = sectionName;
+            const trimmedSectionName = sectionName.trim();
 
-            if (!currentSections.has(trimmedSectionName)) {
-                const newSectionDocRef = doc(handledSectionsRef);
-                await setDoc(newSectionDocRef, { name: trimmedSectionName });
-                console.log(`Added new section: ${trimmedSectionName}`);
+            if (!classSections.has(trimmedSectionName)) {
+                throw new Error(`Class section "${trimmedSectionName}" not found.`);
+            }
+
+            const { assignedTo } = classSections.get(trimmedSectionName);
+
+            if (assignedTo && assignedTo !== "No professor assigned" && assignedTo !== professorName) {
+                throw new Error(`Class section "${trimmedSectionName}" is already assigned to Professor ${assignedTo}.`);
+            }
+
+            if (!currentHandledSections.has(trimmedSectionName)) {
+                sectionsToAdd.push(trimmedSectionName);
             }
         }
 
-        for (const [sectionName, sectionDocRef] of currentSections.entries()) {
-            if (!assignedSectionsArray.some(section => section === sectionName)) {
-                await deleteDoc(sectionDocRef);
-                console.log(`Deleted section: ${sectionName}`);
+        for (const [sectionName, sectionDocRef] of currentHandledSections.entries()) {
+            if (!assignedSectionsArray.includes(sectionName)) {
+                sectionsToDelete.push({ sectionName, sectionDocRef });
             }
         }
 
-        return "Handled sections updated successfully";
+        for (const sectionName of sectionsToAdd) {
+            const { docRef: classSectionDocRef } = classSections.get(sectionName);
+
+            const newHandledSectionDocRef = doc(handledSectionsRef);
+            await setDoc(newHandledSectionDocRef, { name: sectionName });
+            console.log(`Added "${sectionName}" to handledSections subcollection.`);
+
+            await updateDoc(classSectionDocRef, { assignedTo: professorName });
+            console.log(`Updated classSections: Assigned "${sectionName}" to Professor ${professorName}.`);
+        }
+
+        for (const { sectionName, sectionDocRef } of sectionsToDelete) {
+            const { docRef: classSectionDocRef } = classSections.get(sectionName);
+
+            await deleteDoc(sectionDocRef);
+            console.log(`Deleted "${sectionName}" from handledSections subcollection.`);
+
+            await updateDoc(classSectionDocRef, { assignedTo: "No professor assigned" });
+            console.log(`Cleared assignedTo for "${sectionName}" in classSections.`);
+        }
+
+        return "Professor's handled sections updated successfully.";
     } catch (error) {
         console.error("Error updating professor's handled sections:", error);
-        return "Error updating professor's handled sections";
+        throw new Error(`Failed to update professor's handled sections: ${error.message}`);
     }
 };
-//Check if assigneddSectionsArray contains a section that is already assignedTo another professor under classSections collection if yes throw an error, 
-//check if assignedSectionsArray contains a section that is not existing in classSections collection if yes throw an error, if all sections inside the assignedSectionsArray are not taken and existing create a document inside the
-//classSectionsCollection and set the assignedTo property value to this professorName.
-//If the section is deleted in assignedSectionsArray remove the name of the professor on the assignedTo property of that section document inside the classSection 
 
 
 
 
 
-
-//This function going to delete all documents in users, and professors collection that matches professorName 
-export const deleteProfessor = async (professorName) => {
+//This function going to delete all professor related documents in users, and professors collection that matches professorName. 
+export const deleteProfessorRecords = async (professorName) => {
+    const handledSectionsNames = [];
+  
     try {
-        const professorsRef = collection(database, "professors");
-        const professorQuery = query(professorsRef, where("name", "==", professorName));
-        const professorSnapshot = await getDocs(professorQuery);
-    
-        if (professorSnapshot.empty) {
-            return "Professor not found in professors collection.";
-        }
-        
-        const professorDoc = professorSnapshot.docs[0];
-        const professorData = professorDoc.data();
-        const professorUID = professorData.uid;
-    
-        await deleteDoc(professorDoc.ref);
-        let message = "Deleted professor document from professors collection for.";
-    
-        const usersRef = collection(database, "users");
-        const userQuery = query(usersRef, where("uid", "==", professorUID));
-        const userSnapshot = await getDocs(userQuery);
-    
-        if (!userSnapshot.empty) {
-            const userDoc = userSnapshot.docs[0];
-            await deleteDoc(userDoc.ref);
-            message += "Deleted user document from users collection for. ";
-        } else {
-            message += "User document for UID not found in users collection. ";
-        }
-    
-        const user = await authentication.getUser(professorUID);
-        await deleteUser(user);
-        message += "Deleted Firebase Authentication account for.";
-    
-        return message;
-        
+      // Query 'users' collection and delete the document
+      const usersQuery = query(collection(database, "users"), where("name", "==", professorName));
+      const usersSnapshot = await getDocs(usersQuery);
+      usersSnapshot.forEach(async (userDoc) => {
+        await deleteDoc(doc(database, "users", userDoc.id));
+      });
+  
+      // Query 'professors' collection and check for 'handledSections' subcollection
+      const professorsQuery = query(collection(database, "professors"), where("name", "==", professorName));
+      const professorsSnapshot = await getDocs(professorsQuery);
+      for (const professorDoc of professorsSnapshot.docs) {
+        const handledSectionsQuery = collection(database, `professors/${professorDoc.id}/handledSections`);
+        const handledSectionsSnapshot = await getDocs(handledSectionsQuery);
+  
+        handledSectionsSnapshot.forEach((sectionDoc) => {
+          handledSectionsNames.push(sectionDoc.data().name);
+        });
+  
+        await deleteDoc(doc(database, "professors", professorDoc.id));
+      }
+  
+      // Update 'classSections' collection documents
+      for (const sectionName of handledSectionsNames) {
+        const classSectionsQuery = query(collection(database, "classSections"), where("name", "==", sectionName));
+        const classSectionsSnapshot = await getDocs(classSectionsQuery);
+        classSectionsSnapshot.forEach(async (sectionDoc) => {
+          await updateDoc(doc(database, "classSections", sectionDoc.id), { assignedTo: "No professor assigned" });
+        });
+      }
+  
     } catch (error) {
-        return "Error deleting professor";
+      console.error("Error deleting professor records: ", error);
     }
-} 
+  };
 
 
 
@@ -527,7 +750,7 @@ export const getStudentTableDocuments = async () => {
         console.error('Error retrieving student records:', error);
         return [];
     }
-}
+};
 
 
 
@@ -608,6 +831,7 @@ export const createStudentAccount = async (studentIdNumber, studentName, student
 
 
 
+
 //This function returns specific student data.
 export const getStudentData = async (studentId) => {
     try {
@@ -635,6 +859,230 @@ export const getStudentData = async (studentId) => {
 
 
 
+export const deleteStudent = async (studentId) => {
+    try {
+      // Step 1: Delete from 'students' collection
+      const studentsQuery = query(
+        collection(database, "students"),
+        where("idNum", "==", studentId)
+      );
+      const studentsSnapshot = await getDocs(studentsQuery);
+  
+      for (const studentDoc of studentsSnapshot.docs) {
+        await deleteDoc(studentDoc.ref);
+      }
+  
+      // Step 2: Delete from 'users' collection
+      const usersQuery = query(
+        collection(database, "users"),
+        where("idNum", "==", studentId)
+      );
+      const usersSnapshot = await getDocs(usersQuery);
+  
+      for (const userDoc of usersSnapshot.docs) {
+        await deleteDoc(userDoc.ref);
+      }
+  
+      // Step 3: Check the 'section' property and delete from subcollection
+      for (const studentDoc of studentsSnapshot.docs) {
+        const { section } = studentDoc.data();
+  
+        if (section && section !== "No Section Assigned") {
+          const sectionQuery = query(
+            collection(database, "classSections"),
+            where("name", "==", section)
+          );
+          const sectionSnapshot = await getDocs(sectionQuery);
+  
+          for (const sectionDoc of sectionSnapshot.docs) {
+            const studentsSubCollection = collection(sectionDoc.ref, "students");
+            const sectionStudentsQuery = query(
+              studentsSubCollection,
+              where("idNum", "==", studentId)
+            );
+            const sectionStudentsSnapshot = await getDocs(sectionStudentsQuery);
+  
+            for (const sectionStudentDoc of sectionStudentsSnapshot.docs) {
+              await deleteDoc(sectionStudentDoc.ref);
+            }
+          }
+        }
+      }
+  
+      console.log(`Student with ID ${studentId} deleted successfully.`);
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+
+
+
+
+  export const updateStudentCredentials = async (studentIdNumber, studentName, studentSection) => {
+    try {
+      // Query the 'students' collection using studentIdNumber
+      const studentsQuery = query(
+        collection(database, "students"),
+        where("idNum", "==", studentIdNumber)
+      );
+      const studentsSnapshot = await getDocs(studentsQuery);
+  
+      if (studentsSnapshot.empty) {
+        throw new Error("Student not found.");
+      }
+  
+      const studentDoc = studentsSnapshot.docs[0];
+      const studentData = studentDoc.data();
+      const updatedFields = {};
+  
+      // Check if studentName is not empty and update
+      if (studentName && studentName !== studentData.name) {
+        updatedFields.name = studentName;
+  
+        // Update the student's name in the 'users' collection
+        const usersQuery = query(
+          collection(database, "users"),
+          where("idNum", "==", studentIdNumber)
+        );
+        const usersSnapshot = await getDocs(usersQuery);
+  
+        if (!usersSnapshot.empty) {
+          const userDoc = usersSnapshot.docs[0];
+          await updateDoc(userDoc.ref, { name: studentName });
+          console.log(`Updated name in users collection for ID ${studentIdNumber}`);
+        }
+  
+        // Update the student's name in the subcollection of their current section
+        if (studentData.section && studentData.section !== "No Section Assigned") {
+          const currentSectionQuery = query(
+            collection(database, "classSections"),
+            where("name", "==", studentData.section)
+          );
+          const currentSectionSnapshot = await getDocs(currentSectionQuery);
+  
+          if (!currentSectionSnapshot.empty) {
+            const currentSectionDoc = currentSectionSnapshot.docs[0];
+            const currentSubcollectionRef = collection(
+              currentSectionDoc.ref,
+              "students"
+            );
+  
+            const studentInCurrentSectionQuery = query(
+              currentSubcollectionRef,
+              where("idNum", "==", studentIdNumber)
+            );
+            const studentInCurrentSectionSnapshot = await getDocs(
+              studentInCurrentSectionQuery
+            );
+  
+            if (!studentInCurrentSectionSnapshot.empty) {
+              await updateDoc(
+                studentInCurrentSectionSnapshot.docs[0].ref,
+                { name: studentName }
+              );
+              console.log(`Updated name in current section: ${studentData.section}`);
+            }
+          }
+        }
+      }
+  
+      // Check if studentSection is not empty and needs updating
+      if (studentSection && studentSection !== studentData.section) {
+        // Query the 'classSections' collection using the new section name
+        const sectionQuery = query(
+          collection(database, "classSections"),
+          where("name", "==", studentSection)
+        );
+        const sectionSnapshot = await getDocs(sectionQuery);
+  
+        if (sectionSnapshot.empty) {
+          throw new Error(`Section ${studentSection} does not exist.`);
+        }
+  
+        const sectionDoc = sectionSnapshot.docs[0];
+        const studentsSubcollectionRef = collection(sectionDoc.ref, "students");
+  
+        // Count the number of documents in the 'students' subcollection
+        const studentsInSectionSnapshot = await getDocs(studentsSubcollectionRef);
+        const studentCount = studentsInSectionSnapshot.size;
+  
+        if (studentCount >= 40) {
+          throw new Error("Section already full.");
+        }
+  
+        // Add the student to the new section's subcollection (create it if it doesn't exist)
+        await addDoc(studentsSubcollectionRef, {
+          idNum: studentIdNumber,
+          name: studentName || studentData.name,
+          section: studentSection,
+          uid: studentData.uid,
+        });
+  
+        console.log(`Student added to new section: ${studentSection}`);
+  
+        // Update the 'section' in the 'students' collection
+        updatedFields.section = studentSection;
+  
+        // Update the 'section' in the 'users' collection
+        const usersQuery = query(
+          collection(database, "users"),
+          where("idNum", "==", studentIdNumber)
+        );
+        const usersSnapshot = await getDocs(usersQuery);
+  
+        if (!usersSnapshot.empty) {
+          const userDoc = usersSnapshot.docs[0];
+          await updateDoc(userDoc.ref, { section: studentSection });
+          console.log(`Updated section in users collection for ID ${studentIdNumber}`);
+        }
+  
+        // If the student had a previous section and it wasn't "No Section Assigned"
+        if (studentData.section && studentData.section !== "No Section Assigned") {
+          const previousSectionQuery = query(
+            collection(database, "classSections"),
+            where("name", "==", studentData.section)
+          );
+          const previousSectionSnapshot = await getDocs(previousSectionQuery);
+  
+          if (!previousSectionSnapshot.empty) {
+            const previousSectionDoc = previousSectionSnapshot.docs[0];
+            const previousSubcollectionRef = collection(
+              previousSectionDoc.ref,
+              "students"
+            );
+  
+            const studentInPreviousSectionQuery = query(
+              previousSubcollectionRef,
+              where("idNum", "==", studentIdNumber)
+            );
+            const studentInPreviousSectionSnapshot = await getDocs(
+              studentInPreviousSectionQuery
+            );
+  
+            if (!studentInPreviousSectionSnapshot.empty) {
+              await deleteDoc(studentInPreviousSectionSnapshot.docs[0].ref);
+              console.log(
+                `Student removed from previous section: ${studentData.section}`
+              );
+            }
+          }
+        }
+      }
+  
+      // If there are fields to update, proceed with updating the student document
+      if (Object.keys(updatedFields).length > 0) {
+        await updateDoc(studentDoc.ref, updatedFields);
+        console.log(`Student with ID ${studentIdNumber} updated successfully.`);
+      } else {
+        console.log("No fields provided for update.");
+      }
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
+
 
 export const getAuthentication = () => {
     return authentication;
@@ -644,3 +1092,50 @@ export const signOutUser = async () => {
     signOut(authentication);
     return "../login.html";
 }
+
+
+
+
+
+// const listenForSectionNameChange = (sectionDocRef, studentData) => {
+//     const unsubscribe = onSnapshot(sectionDocRef, async (docSnapshot) => {
+//         const sectionData = docSnapshot.data();
+
+//         // Only update if the section name is different from the current student's section
+//         if (sectionData.name !== studentData.section) {
+//             console.log(`Section name changed for student ${studentData.name} from ${studentData.section} to ${sectionData.name}`);
+
+//             // Update the section for the student in the students collection
+//             const studentsRef = collection(database, 'students');
+//             const studentQuery = query(studentsRef, where("uid", "==", studentData.uid));
+//             const studentSnapshot = await getDocs(studentQuery);
+
+//             studentSnapshot.forEach(async (studentDoc) => {
+//                 const studentDocRef = studentDoc.ref;
+
+//                 // Only update if the section has actually changed
+//                 if (studentDoc.data().section !== sectionData.name) {
+//                     const updatedData = { ...studentDoc.data(), section: sectionData.name };
+
+//                     // Update the student's section in the main students collection
+//                     await updateDoc(studentDocRef, { section: sectionData.name });
+//                     console.log(`Updated section for student ${studentData.name} to ${sectionData.name}`);
+
+//                     // If the student is in the section's "students" subcollection, update the student's section there as well
+//                     const studentsSubcollectionRef = collection(docSnapshot.ref, "students");
+//                     const studentSubDoc = doc(studentsSubcollectionRef, studentData.uid);
+//                     await setDoc(studentSubDoc, updatedData);
+//                     console.log(`Updated student's section in subcollection for section ${sectionData.name}`);
+//                 }
+//             });
+//         }
+//     });
+
+//     // Return unsubscribe function to stop listening
+//     return unsubscribe;
+// };
+
+
+//Take note:
+//Student ID number is not editable. It must be correct from the beginning. 
+//Upon student creation, student email number and student id number must match.

@@ -1638,6 +1638,11 @@ body {
 
     flex: 1;
 }
+
+.edit-student-modal-id-number-container input {
+    cursor: not-allowed;
+}
+
 .edit-student-modal-name-container input::placeholder,
 .edit-student-modal-id-number-container input::placeholder,
 .edit-student-modal-section-container input::placeholder {
