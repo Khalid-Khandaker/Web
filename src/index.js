@@ -2,8 +2,9 @@
 import { getProfessorDetails, addSection, signOutUser, 
     getAssignedStudents, deleteSection, updateClassSectionName,
     getProfessorTableDocuments, getClassSectionTableDocuments, addCreateProfessor,
-    updateProfessorHandledSections, getProfessorHandledSections, deleteProfessorRecords,
-    getStudentTableDocuments, createStudentAccount, getStudentData, deleteStudent, updateStudentCredentials
+    updateProfessor, getProfessorHandledSections, deleteProfessorRecords,
+    getStudentTableDocuments, createStudentAccount, getStudentData, 
+    deleteStudent, updateStudentCredentials, renameProfessor
 } from "./utils/firebase";
 
 //The array below are used to prevent click stacking.
@@ -626,7 +627,9 @@ function wakeProfessorTableDataContainer() {
 function professorTableDataContainerHandler(professorTableDataContainerHandlerEvent) {
     const professorName = professorTableDataContainerHandlerEvent.target.querySelector('.professor-name-container').textContent;
 
-    editProfessorHeader.innerHTML = `<p>${professorName} Handled Sections</p>`;
+    editProfessorHeader.innerHTML = `<p>Editing ${professorName}</p>`;
+    editProfessorForm.new_professor_name.placeholder = professorName;
+    
     handledSectionsContainer.innerHTML = "";
 
     let assignedSectionsArray = [];
@@ -776,7 +779,11 @@ function wakeConfirmEditProfessorButton(assignedSectionsArray, professorName) {
     console.log("> Inside wakeConfirmEditProfessorButton");
 }
 function confirmEditProfessorButtonHandler(assignedSectionsArray, professorName) {
-    updateProfessorHandledSections(professorName, assignedSectionsArray).then((message) => {
+    
+    let newProfessorName = editProfessorForm.new_professor_name.value;
+    editProfessorForm.reset();
+
+    updateProfessor(professorName, assignedSectionsArray).then((message) => {
         initializeProfessorTable();  
         
         editProfessorModal.style.display = "none";
@@ -784,6 +791,13 @@ function confirmEditProfessorButtonHandler(assignedSectionsArray, professorName)
         console.log(message);
     });
     
+    if(newProfessorName !== "") {
+        renameProfessor(professorName, newProfessorName).then(() => {
+            initializeProfessorTable();
+        });
+    } else {
+        console.log(`No new name for professor ${professorName}`);
+    }
 }
 //End
 

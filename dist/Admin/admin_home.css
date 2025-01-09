@@ -1163,6 +1163,44 @@ body {
 
     object-fit: contain;
 }
+
+/*Insert edit professor name input here */
+.edit-professor-modal-name-container {
+    padding: 16px 72px;
+    
+    display: flex;
+}
+.edit-professor-modal-name-container div {
+    width: 110px;
+}
+.edit-professor-modal-name-container div > p {
+    font-size: 16px;
+    font-weight: 200;
+
+    color: #ffffff;
+
+    margin: 0px;
+}
+.edit-professor-modal-name-container input {
+    border: none;
+    border-bottom: 1px solid #9a9a9a;
+
+    background-color: transparent;
+    color: #fe8f01;
+
+    font-size: 14px;
+
+    flex: 1;
+}
+.edit-professor-modal-name-container input::placeholder {
+    color: #873510;
+}
+.edit-professor-modal-name-container input:focus {
+    outline: none;
+}
+
+/*End*/
+
 .edit-professor-modal-section-outer-container {
     box-sizing: border-box;
     padding: 16px 72px;

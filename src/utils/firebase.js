@@ -600,8 +600,8 @@ export const getProfessorHandledSections = async (professorName) => {
 
 
 
-//This function retrieves all professor handled sections.
-export const updateProfessorHandledSections = async (professorName, assignedSectionsArray) => {
+//This function updates professor handled sections.
+export const updateProfessor = async (professorName, assignedSectionsArray) => {
     try {
         const professorsRef = collection(database, "professors");
         const professorQuery = query(professorsRef, where("name", "==", professorName));
@@ -684,6 +684,69 @@ export const updateProfessorHandledSections = async (professorName, assignedSect
         throw new Error(`Failed to update professor's handled sections: ${error.message}`);
     }
 };
+
+
+
+
+
+//This function will update professor name to all related document.
+export const renameProfessor = async (oldProfessorName, newProfessorName) => {
+    try {
+        // Query the users collection with the old professor name and update to the new name
+        const usersCollection = collection(database, "users");
+        const usersQuery = query(usersCollection, where("name", "==", oldProfessorName));
+        const usersSnapshot = await getDocs(usersQuery);
+
+        if (!usersSnapshot.empty) {
+            usersSnapshot.forEach(async (userDoc) => {
+                const userRef = doc(database, "users", userDoc.id);
+                await updateDoc(userRef, { name: newProfessorName });
+                console.log(`User "${oldProfessorName}" name updated to "${newProfessorName}" in the users collection.`);
+            });
+        }
+
+        // Query the professors collection with the old professor name and update to the new name
+        const professorsCollection = collection(database, "professors");
+        const professorsQuery = query(professorsCollection, where("name", "==", oldProfessorName));
+        const professorsSnapshot = await getDocs(professorsQuery);
+
+        if (!professorsSnapshot.empty) {
+            const professorDoc = professorsSnapshot.docs[0];
+            const professorRef = doc(database, "professors", professorDoc.id);
+
+            // Update the professor's name
+            await updateDoc(professorRef, { name: newProfessorName });
+            console.log(`Professor "${oldProfessorName}" name updated to "${newProfessorName}" in the professors collection.`);
+
+            // Access the handledSections subcollection
+            const handledSectionsRef = collection(professorRef, "handledSections");
+            const handledSectionsSnapshot = await getDocs(handledSectionsRef);
+
+            if (!handledSectionsSnapshot.empty) {
+                handledSectionsSnapshot.forEach(async (sectionDoc) => {
+                    const sectionName = sectionDoc.data().name;
+
+                    // Query the classSections collection with the section name and update assignedTo to newProfessorName
+                    const classSectionsCollection = collection(database, "classSections");
+                    const classSectionsQuery = query(classSectionsCollection, where("name", "==", sectionName));
+                    const classSectionsSnapshot = await getDocs(classSectionsQuery);
+
+                    if (!classSectionsSnapshot.empty) {
+                        classSectionsSnapshot.forEach(async (classSectionDoc) => {
+                            const classSectionRef = doc(database, "classSections", classSectionDoc.id);
+                            await updateDoc(classSectionRef, { assignedTo: newProfessorName });
+                            console.log(`Section "${sectionName}" assignedTo updated to "${newProfessorName}" in classSections collection.`);
+                        });
+                    }
+                });
+            }
+        }
+    } catch (error) {
+        console.error("Error renaming professor and updating related sections:", error.message);
+    }
+};
+
+
 
 
 
