@@ -17,7 +17,7 @@
   background: #898989; 
 }
 /*End of Scroll Section*/
-
+/*Start of teacher_home style*/
 body {
     margin: 0px;
     height: 100vh;
@@ -47,6 +47,9 @@ body {
 
     padding: 0px 100px;
 }
+.teacher-header p {
+    cursor: pointer;
+}
 .teacher-subheader {
     display: flex;
     justify-content: space-between;
@@ -69,6 +72,8 @@ body {
 
     font-weight: 500;
     color: white;
+
+    cursor: pointer;
 }
 .student-navigation-button > p::after {
     content: "";
@@ -89,6 +94,8 @@ body {
 
     font-weight: 500;
     color: white;
+
+    cursor: pointer;
 }
 .analytics-navigation-button > p::after {
     content: "";
@@ -132,7 +139,7 @@ body {
     background-color: #190126;
 
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 150px 100px;
+    grid-template-columns: 1fr 1fr 1fr 155px;
     justify-items: center;
     align-items: center;
 }
@@ -159,28 +166,55 @@ body {
     height: 35px;
 
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 150px 100px;
+    grid-template-columns: 1fr 1fr 1fr 155px;
+    justify-items: center;
     align-items: center;
 
     background-color: #13011b;
 
     border: 1px solid #251235;
+
+    cursor: pointer;
+}
+.student-table-data:hover {
+    background-color: #14011e;
 }
 .student-table-data p {
     margin: 0px;
-    color: #cac7dd;
-    font-weight: 300;
+
+    color: #cacaca;
+    font-weight: 200;
     text-align: center;
     white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis;
+
+    overflow: hidden;
 }
-.student-table-data p:nth-last-child(-n+2) {
-    visibility: hidden;
+.student-name-container,
+.student-rank-container,
+.student-points-container,
+.student-delete-container {
+    width: 99%;
+    height: 35px;
+    line-height: 35px;
+
+    text-align: center;
+
+    overflow: hidden;
 }
-.student-table-data:hover p:nth-last-child(-n+2) {
-    visibility: visible;
-    text-decoration: underline;
+.student-delete-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.student-delete-container:hover {
+    cursor: pointer;
+    background-color: rgba(91, 28, 28, 0.308);
+}
+.student-delete-container img {
+    width: 15px;
+
+    object-fit: contain;
 }
 .section-navigation-container {
     height: max-content;
@@ -200,9 +234,307 @@ body {
     font-size: 14px;
 
     margin: 0px;
+
+    cursor: pointer;
 }
 .section-navigation-button {
     border: 2px solid transparent;
 
     padding: 4px 12px;
 }
+/*End of teacher_home style*/
+/*Start of latest style*/
+.highest-latest-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 1;
+}
+.highest-latest-modal {
+    width: 350px;
+    height: max-content;
+
+    border: 3px solid #2b1739;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+}
+.highest-latest-modal-top-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.highest-latest-modal-top-section p {
+    color: #f3e6ff;
+    font-weight: 400;
+
+    margin: 0px;
+}
+.highest-latest-modal-close {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.highest-latest-modal-close img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+.highest-latest-modal-middle-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 18px 32px;
+}
+.highest-button,
+.latest-button {
+    padding: 4px 16px;
+    border: 2px solid #512475; 
+}
+.highest-button p,
+.latest-button p {
+    margin: 0px;
+    font-weight: 500;
+    color: #f3e6ff;
+}
+.highest-latest-modal-total-attempts {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    box-sizing: border-box;
+    padding: 6px 0px;
+}
+.highest-latest-modal-total-attempts p {
+    margin: 0px;
+    color: #858585;
+    font-weight: 300;
+}
+/*End of latest style*/
+/*Start of highest_performance style*/
+.highest-performance-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 1;
+}
+
+.highest-performance-modal {
+    border: 3px solid #2b1739;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+
+    width: 650px;
+    height: 350px;
+}
+.highest-performance-modal-top-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.highest-performance-modal-top-section p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #f3e6ff;
+
+    margin: 0px;
+}
+.highest-performance-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.highest-performance-modal-close-container img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+.highest-performance-modal-module-navigation-container {
+    box-sizing: border-box;
+    padding: 16px 12px;
+
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.highest-performance-modal-module-navigation-container p {
+    display: inline-block;
+    position: relative;
+    padding-bottom: 6px;
+    margin: 0px 12px;
+
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+}
+.highest-performance-modal-module-navigation-container p:nth-child(1)::after {
+    content: "";
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    height: 4px;
+
+    background-color: #ad1f48;
+    border-radius: 4px;
+}
+.highest-performance-modal-data-container {
+    box-sizing: border-box;
+    padding: 0px 48px;
+
+    height: 250px;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill 1fr);
+    align-content: start;
+
+    row-gap: 6px;   
+
+    overflow-y: auto;
+}
+.highest-performance-modal-data {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    border-bottom: 1px solid orange;
+}
+/*End of highest_performance style*/
+/*Start of latest_performance style*/
+.latest-performance-modal-container {
+    height: 100vh;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #0c001248;
+
+    z-index: 1;
+}
+
+.latest-performance-modal {
+    border: 3px solid #2b1739;
+
+    box-sizing: border-box;
+    padding: 6px 12px;
+
+    width: 650px;
+    height: 350px;
+}
+.latest-performance-modal-top-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.latest-performance-modal-top-section p {
+    font-size: 18px;
+    font-weight: 400;
+
+    color: #f3e6ff;
+
+    margin: 0px;
+}
+.latest-performance-modal-close-container {
+    width: 16px;
+    height: 16px;
+
+    overflow: hidden;
+}
+.latest-performance-modal-close-container img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+.latest-performance-modal-module-navigation-container {
+    box-sizing: border-box;
+    padding: 16px 12px;
+
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.latest-performance-modal-module-navigation-container p {
+    display: inline-block;
+    position: relative;
+    padding-bottom: 6px;
+    margin: 0px 12px;
+
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+}
+.latest-performance-modal-module-navigation-container p:nth-child(1)::after {
+    content: "";
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    height: 4px;
+
+    background-color: #ad1f48;
+    border-radius: 4px;
+}
+.latest-performance-modal-data-container {
+    box-sizing: border-box;
+    padding: 0px 48px;
+
+    height: 250px;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill 1fr);
+    align-content: start;
+
+    row-gap: 12px;   
+
+    overflow-y: auto;
+}
+.latest-performance-modal-data {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    border-bottom: 1px solid orange;
+}
+/*End of latest_performance style*/

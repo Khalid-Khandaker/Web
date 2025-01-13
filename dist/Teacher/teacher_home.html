@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="teacher_home.css">
+    <!--<script src="../teacher.bundle.js" defer></script>-->
 </head>
 <body>
     <div class="teacher-main-body">
@@ -32,36 +33,155 @@
         </div>
         <div class="student-table-header-container">
             <div class="student-table-header">
-                <p>Name</p>
-                <p>Password</p>
-                <p>Rank</p>
-                <p>Points</p>
+                <div><p>Name</p></div>
+                <div><p>Rank</p></div>
+                <div><p>Points</p></div>
             </div>
         </div>
         <div class="student-table-data-container">
             <div class="student-table-data">
-                <p>Khandaker, Khalid T.</p>
-                <p>* * * * * * * * * * *</p>
-                <p>Expert</p>
-                <p>1,290</p>
-                <p>Reset Password</p>
-                <p>Delete</p>
+                <div class="student-name-container">
+                    <p>Khandaker, Khalid T.</p>
+                </div>
+                <div class="student-rank-container">
+                    <p>Expert</p>
+                </div>
+                <div class="student-points-container">
+                    <p>1,290</p>
+                </div>
+                <div class="student-delete-container">
+                    <img src="../Assets/Icons/delete_icon.svg" alt="Delete">
+                </div>
             </div>
         </div>
         <div class="section-navigation-container">
             <div class="section-navigation-button" style="border-bottom: 4px solid #ad1f48;">
                 <p>TN192</p>
             </div>
-            <div class="section-navigation-button">
-                <p>TN193</p>
+        </div>
+    </div>
+
+
+    <div class="highest-latest-modal-container">
+        <div class="highest-latest-modal">
+            <div class="highest-latest-modal-top-section">
+                <div class="highest-latest-modal-title">
+                    <p>Viewing Student Performance</p>
+                </div>
+                <div class="highest-latest-modal-close">
+                    <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                </div>
             </div>
-            <div class="section-navigation-button">
-                <p>TN194</p>
+            <div class="highest-latest-modal-middle-section">
+                <div class="highest-button">
+                    <p>Highest</p>
+                </div>
+                <div class="latest-button">
+                    <p>Latest</p>
+                </div>
             </div>
-            <div class="section-navigation-button">
-                <p>TN195</p>
+            <div class="highest-latest-modal-total-attempts">
+                <p>Total Attempts: 5</p>
             </div>
         </div>
     </div>
+
+
+    <div class="highest-performance-modal-container">
+        <div class="highest-performance-modal">
+            <div class="highest-performance-modal-top-section">
+                <div class="highest-performance-modal-title">
+                    <p>Viewing Student Performance</p>
+                </div>
+                <div class="highest-performance-modal-close-container">
+                    <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                </div>
+            </div>
+            <div class="highest-performance-modal-module-navigation-container">
+                <p>Module 1</p>
+                <p>Module 2</p>
+                <p>Module 3</p>
+            </div>
+            <div class="highest-performance-modal-data-container">
+                <div class="highest-performance-modal-data">
+                    <div class="highest-peroformance-pinyin-character">
+                        <p style="margin: 0px; color: white;">A</p>
+                    </div>
+                    <div class="highest-performance-modal-pinyin-grade">
+                        <p style="margin: 0px; color: white;">4/5</p>
+                    </div>
+                </div>
+                <div class="highest-performance-modal-data">
+                    <div class="highest-peroformance-pinyin-character">
+                        <p style="margin: 0px; color: white;">B</p>
+                    </div>
+                    <div class="highest-performance-modal-pinyin-grade">
+                        <p style="margin: 0px; color: white;">5/5</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="latest-performance-modal-container">
+        <div class="latest-performance-modal">
+            <div class="latest-performance-modal-top-section">
+                <div class="latest-performance-modal-title">
+                    <p>Viewing Student Performance</p>
+                </div>
+                <div class="latest-performance-modal-close-container">
+                    <img src="../Assets/Icons/close_icon.svg" alt="Close">
+                </div>
+            </div>
+            <div class="latest-performance-modal-module-navigation-container">
+                <p>Module 1</p>
+                <p>Module 2</p>
+                <p>Module 3</p>
+            </div>
+            <div class="latest-performance-modal-data-container">
+                <div class="latest-performance-modal-data">
+                    <div class="latest-peroformance-pinyin-character">
+                        <p style="margin: 0px; color: white;">A</p>
+                    </div>
+                    <div class="latest-performance-modal-pinyin-grade">
+                        <p style="margin: 0px; color: white;">4/5</p>
+                    </div>
+                </div>
+                <div class="latest-performance-modal-data">
+                    <div class="latest-peroformance-pinyin-character">
+                        <p style="margin: 0px; color: white;">A</p>
+                    </div>
+                    <div class="latest-performance-modal-pinyin-grade">
+                        <p style="margin: 0px; color: white;">4/5</p>
+                    </div>
+                </div>
+                <div class="latest-performance-modal-data">
+                    <div class="latest-peroformance-pinyin-character">
+                        <p style="margin: 0px; color: white;">A</p>
+                    </div>
+                    <div class="latest-performance-modal-pinyin-grade">
+                        <p style="margin: 0px; color: white;">4/5</p>
+                    </div>
+                </div>
+                <div class="latest-performance-modal-data">
+                    <div class="latest-peroformance-pinyin-character">
+                        <p style="margin: 0px; color: white;">A</p>
+                    </div>
+                    <div class="latest-performance-modal-pinyin-grade">
+                        <p style="margin: 0px; color: white;">4/5</p>
+                    </div>
+                </div>
+                <div class="latest-performance-modal-data">
+                    <div class="latest-peroformance-pinyin-character">
+                        <p style="margin: 0px; color: white;">A</p>
+                    </div>
+                    <div class="latest-performance-modal-pinyin-grade">
+                        <p style="margin: 0px; color: white;">4/5</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
