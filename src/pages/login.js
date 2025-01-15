@@ -1,31 +1,35 @@
 import { signIn, getAuthentication } from "../utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
-//Start of login DOM initialization
+// Start of login DOM initialization
 const loginForm = document.querySelector(".login-form");
 const loginMessage = document.querySelector('.login-message-container p');
-//End of login DOM initialization
+// End of login DOM initialization
 
-//Start of Tutoriowl login functionality
-if(loginForm) {
-    loginForm.addEventListener("submit", function (event) {
-        event.preventDefault();
+// Start of Tutoriowl login functionality
+if (loginForm) {
+  loginForm.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-        const email = loginForm.email.value;
-        const password = loginForm.password.value;
-        
-        signIn(email, password).then((homepage) => {
-            window.location.href = homepage;
-        });
-    });
+    const email = loginForm.email.value;
+    const password = loginForm.password.value;
+
+    signIn(email, password).then((homepage) => {
+        window.location.href = homepage;
+      })
+      .catch((error) => {
+        loginMessage.innerHTML = "Login failed. Please try again.";
+        console.error("Login error:", error);
+      });
+  });
 }
-//End of Tutoriowl login functionality
+// End of Tutoriowl login functionality
 
-//Listens to authentication state changes
+// Listens to authentication state changes
 onAuthStateChanged(getAuthentication(), (user) => { 
-    if (user) {
-        loginMessage.innerHTML = "Welcome";
-    } else {
-        loginMessage.innerHTML = "Enter login credentials to continue";
-    }
+  if (user) {
+    loginMessage.innerHTML = "Welcome";
+  } else {
+    loginMessage.innerHTML = "Enter login credentials to continue";
+  }
 });

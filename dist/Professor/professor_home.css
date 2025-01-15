@@ -108,24 +108,6 @@ body {
     background: transparent;
     border-radius: 4px;
 }
-.student-add-button {
-    padding: 4px 16px;
-    border: 2px solid #512475; 
-
-    align-content: center;
-
-    transition: border-radius 0.2s;
-}
-.student-add-button p {
-    margin: 0px;
-    font-weight: 500;
-    color: #f3e6ff;
-}
-.student-add-button:hover {
-    cursor: pointer; 
-    background-color: #29013e;
-    border-radius: 8px;
-}
 .student-table-header-container {
     box-sizing: border-box;
     padding: 0px 25px;
@@ -139,7 +121,7 @@ body {
     background-color: #190126;
 
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 155px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 155px;
     justify-items: center;
     align-items: center;
 }
@@ -166,7 +148,7 @@ body {
     height: 35px;
 
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 155px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 155px;
     justify-items: center;
     align-items: center;
 
@@ -190,9 +172,20 @@ body {
 
     overflow: hidden;
 }
+.student-number-container,
 .student-name-container,
 .student-rank-container,
-.student-points-container,
+.student-points-container {
+    width: 99%;
+    height: 35px;
+    line-height: 35px;
+
+    text-align: center;
+
+    overflow: hidden;
+
+    pointer-events: none;
+}
 .student-delete-container {
     width: 99%;
     height: 35px;
@@ -202,19 +195,18 @@ body {
 
     overflow: hidden;
 }
-.student-delete-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 .student-delete-container:hover {
     cursor: pointer;
     background-color: rgba(91, 28, 28, 0.308);
+
+    pointer-events: auto;
 }
 .student-delete-container img {
     width: 15px;
 
     object-fit: contain;
+
+    pointer-events: none;
 }
 .section-navigation-container {
     height: max-content;
@@ -241,6 +233,9 @@ body {
     border: 2px solid transparent;
 
     padding: 4px 12px;
+}
+.section-navigation-button:hover {
+    cursor: pointer;
 }
 /*End of teacher_home style*/
 /*Start of latest style*/
@@ -288,6 +283,9 @@ body {
 
     overflow: hidden;
 }
+.highest-latest-modal-close:hover {
+    cursor: pointer;
+}
 .highest-latest-modal-close img {
     width: 100%;
     height: 100%;
@@ -307,6 +305,10 @@ body {
 .latest-button {
     padding: 4px 16px;
     border: 2px solid #512475; 
+}
+.highest-button:hover,
+.latest-button:hover {
+    cursor: pointer;
 }
 .highest-button p,
 .latest-button p {
@@ -353,6 +355,8 @@ body {
     box-sizing: border-box;
     padding: 6px 12px;
 
+    background-color: #0c0012;
+
     width: 650px;
     height: 350px;
 }
@@ -375,6 +379,9 @@ body {
 
     overflow: hidden;
 }
+.highest-performance-modal-close-container:hover {
+    cursor: pointer;
+}
 .highest-performance-modal-close-container img {
     width: 100%;
     height: 100%;
@@ -390,7 +397,9 @@ body {
     justify-content: start;
     align-items: center;
 }
-.highest-performance-modal-module-navigation-container p {
+.highest-performance-module-one > p,
+.highest-performance-module-two > p,
+.highest-performance-module-three > p {
     display: inline-block;
     position: relative;
     padding-bottom: 6px;
@@ -399,17 +408,25 @@ body {
     font-size: 14px;
     font-weight: 500;
     color: white;
+
+    cursor: pointer;
 }
-.highest-performance-modal-module-navigation-container p:nth-child(1)::after {
+.highest-performance-module-one > p::after,
+.highest-performance-module-two > p::after,
+.highest-performance-module-three > p::after {
     content: "";
     position: absolute;
     left: 0px;
     right: 0px;
     bottom: 0px;
-    height: 4px;
+    height: 6px;
 
-    background-color: #ad1f48;
+    background-color: var(--after-background, #ad1f48);
     border-radius: 4px;
+}
+.highest-performance-module-two > p::after,
+.highest-performance-module-three > p::after {
+    background-color: var(--after-background, transparent);
 }
 .highest-performance-modal-data-container {
     box-sizing: border-box;
@@ -455,6 +472,8 @@ body {
 .latest-performance-modal {
     border: 3px solid #2b1739;
 
+    background-color: #0c0012;
+
     box-sizing: border-box;
     padding: 6px 12px;
 
@@ -480,6 +499,9 @@ body {
 
     overflow: hidden;
 }
+.latest-performance-modal-close-container:hover {
+    cursor: pointer;
+}
 .latest-performance-modal-close-container img {
     width: 100%;
     height: 100%;
@@ -495,7 +517,9 @@ body {
     justify-content: start;
     align-items: center;
 }
-.latest-performance-modal-module-navigation-container p {
+.latest-performance-module-one > p,
+.latest-performance-module-two > p,
+.latest-performance-module-three > p {
     display: inline-block;
     position: relative;
     padding-bottom: 6px;
@@ -504,17 +528,25 @@ body {
     font-size: 14px;
     font-weight: 500;
     color: white;
+
+    cursor: pointer;
 }
-.latest-performance-modal-module-navigation-container p:nth-child(1)::after {
+.latest-performance-module-one > p::after,
+.latest-performance-module-two > p::after,
+.latest-performance-module-three > p::after {
     content: "";
     position: absolute;
     left: 0px;
     right: 0px;
     bottom: 0px;
-    height: 4px;
+    height: 6px;
 
-    background-color: #ad1f48;
+    background-color: var(--after-background, #ad1f48);
     border-radius: 4px;
+}
+.latest-performance-module-two > p::after,
+.latest-performance-module-three > p::after {
+    background-color: var(--after-background, transparent);
 }
 .latest-performance-modal-data-container {
     box-sizing: border-box;

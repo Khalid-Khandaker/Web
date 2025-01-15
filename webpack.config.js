@@ -5,7 +5,8 @@ module.exports = {
     entry: {
         index: './src/index.js',
         login: './src/pages/login.js',
-        firebase: './src/utils/firebase.js'
+        firebase: './src/utils/firebase.js',
+        professor: './src/professor.js'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),

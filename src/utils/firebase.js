@@ -20,12 +20,14 @@ import {
 
 import {
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-    signOut, updateProfile
+    signOut, updateProfile, setPersistence,
+    browserSessionPersistence
 } from "firebase/auth";
 
 const app = initializeApp(firebaseAppConfig);
 const database = getFirestore(app);
 const authentication = getAuth(app);
+
 
 //Global variables 
 let oldClassSectionNameTwo = "";//Used for renaming class section.
@@ -40,18 +42,30 @@ let studentsEnrolledInSection = []; // Array to store names of students
 
 //This function is used to sign in user and direct them to appropriate page.
 export const signIn = async (email, password) => {
-    const credentials = await signInWithEmailAndPassword(authentication, email, password);
-    const uid = credentials.user.uid;
-    const usersCollectionReference = collection(database, "users");
-    const usersQuery = query(usersCollectionReference, where("uid", "==", uid));
-    const userSnapshot = await getDocs(usersQuery);
-
-    if (userSnapshot.docs[0].data().userType == "admin") {
+    try {
+      // Set persistence to session-only
+      await setPersistence(authentication, browserSessionPersistence);
+      
+      // Sign in the user
+      const credentials = await signInWithEmailAndPassword(authentication, email, password);
+      const uid = credentials.user.uid;
+  
+      // Query the Firestore collection for the user
+      const usersCollectionReference = collection(database, "users");
+      const usersQuery = query(usersCollectionReference, where("uid", "==", uid));
+      const userSnapshot = await getDocs(usersQuery);
+  
+      // Check user type and return the appropriate homepage
+      if (userSnapshot.docs[0].data().userType === "admin") {
         return "Admin/admin_home.html";
-    } else {
-        return "Teacher/teacher_home.html";
+      } else {
+        return "Professor/professor_home.html";
+      }
+    } catch (error) {
+      console.error("Error signing in:", error);
+      throw error; // Re-throw the error to handle it in the login.js
     }
-}
+  };
 
 
 
@@ -200,6 +214,11 @@ export const addCreateProfessor = async (professorName, professorEmail, professo
         const user = userCredential.user;
         const professorUID = user.uid;
 
+        // Set displayName for the created user
+        await updateProfile(user, {
+            displayName: professorName
+        });
+
         const professorData = {
             uid: professorUID,
             name: professorName,
@@ -235,6 +254,7 @@ export const addCreateProfessor = async (professorName, professorEmail, professo
         throw new Error("Failed to create professor: " + error.message);
     }
 };
+
 
 
 
@@ -1145,7 +1165,7 @@ export const deleteStudent = async (studentId) => {
     }
   };
 
-
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export const getAuthentication = () => {
     return authentication;
@@ -1156,49 +1176,73 @@ export const signOutUser = async () => {
     return "../login.html";
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//This function checks for section handled by the current professor.
+export const checkAssignedSection = async (professorName) => {
+    try {
+      const classSectionsCollection = collection(database, "classSections");
+  
+      const sectionsQuery = query(classSectionsCollection, where("assignedTo", "==", professorName));
+  
+      const querySnapshot = await getDocs(sectionsQuery);
+  
+      const assignedSections = [];
+  
+      querySnapshot.forEach((doc) => {
+        assignedSections.push(doc.data().name);
+      });
+  
+      if (assignedSections.length === 0) {
+        return "No assigned sections";
+      }
+  
+      return assignedSections;
+  
+    } catch (error) {
+      console.error("Error fetching assigned sections:", error);
+      throw error;
+    }
+};
 
 
 
 
-// const listenForSectionNameChange = (sectionDocRef, studentData) => {
-//     const unsubscribe = onSnapshot(sectionDocRef, async (docSnapshot) => {
-//         const sectionData = docSnapshot.data();
 
-//         // Only update if the section name is different from the current student's section
-//         if (sectionData.name !== studentData.section) {
-//             console.log(`Section name changed for student ${studentData.name} from ${studentData.section} to ${sectionData.name}`);
+export const getEnrolledStudents = async (sectionName) => {
+    const sectionRef = collection(database, 'classSections');
+    
+    // Query the classSections collection for the section with the specified name
+    const sectionQuery = query(sectionRef, where('name', '==', sectionName));
+    const sectionSnapshot = await getDocs(sectionQuery);
 
-//             // Update the section for the student in the students collection
-//             const studentsRef = collection(database, 'students');
-//             const studentQuery = query(studentsRef, where("uid", "==", studentData.uid));
-//             const studentSnapshot = await getDocs(studentQuery);
+    // Check if the section exists and retrieve the students subcollection
+    if (!sectionSnapshot.empty) {
+        const sectionDoc = sectionSnapshot.docs[0];
+        const studentsRef = collection(database, 'classSections', sectionDoc.id, 'students');
+        const studentsSnapshot = await getDocs(studentsRef);
 
-//             studentSnapshot.forEach(async (studentDoc) => {
-//                 const studentDocRef = studentDoc.ref;
+        // Store the student documents in an array
+        const studentsArray = studentsSnapshot.docs.map(doc => {
+            const studentData = doc.data();
+            return {
+                idNum: studentData.idNum,
+                name: studentData.name,
+                section: studentData.section,
+                uid: studentData.uid
+            };
+        });
 
-//                 // Only update if the section has actually changed
-//                 if (studentDoc.data().section !== sectionData.name) {
-//                     const updatedData = { ...studentDoc.data(), section: sectionData.name };
+        return studentsArray;
+    } else {
+        console.log(`No section found with the name: ${sectionName}`);
+        return [];
+    }
+};
 
-//                     // Update the student's section in the main students collection
-//                     await updateDoc(studentDocRef, { section: sectionData.name });
-//                     console.log(`Updated section for student ${studentData.name} to ${sectionData.name}`);
-
-//                     // If the student is in the section's "students" subcollection, update the student's section there as well
-//                     const studentsSubcollectionRef = collection(docSnapshot.ref, "students");
-//                     const studentSubDoc = doc(studentsSubcollectionRef, studentData.uid);
-//                     await setDoc(studentSubDoc, updatedData);
-//                     console.log(`Updated student's section in subcollection for section ${sectionData.name}`);
-//                 }
-//             });
-//         }
-//     });
-
-//     // Return unsubscribe function to stop listening
-//     return unsubscribe;
-// };
-
-
-//Take note:
-//Student ID number is not editable. It must be correct from the beginning. 
-//Upon student creation, student email number and student id number must match.
+export const getStudentPerformance = (enrolledSection, studentNumber, moduleName) => {//Rank and Points... || Use professorName, enrolledSection
+    //Can you update this code to achieve the following:
+    // Using the value of 'enrolledSection' query the classSections collection with the document field 'name'. Once retrieved, access the subcollection called 'students',
+    // then using the 'studentNumber' value query the students subcollection with the document field 'idNum'. Once retrieved, access the subcollection called 'performances',
+    // then using the value of 'moduleName' query the subcollection 'performances' with the document field 'moduleName' once retrieved access its subcollection called 'attempts'
+}
