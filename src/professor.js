@@ -13,6 +13,10 @@ const highestButton = document.querySelector('.highest-button');
 const latestButton = document.querySelector('.latest-button');
 const highestPerformanceModuleNavigation = document.querySelector('.highest-performance-modal-module-navigation-container');
 const latestPerformanceModuleNavigation = document.querySelector('.latest-performance-modal-module-navigation-container');
+const studentTableContainer = document.querySelector('.student-table-container');
+const teacherSubheaderNavigation = document.querySelector('.teacher-subheader');
+const analyticsContainer = document.querySelector('.analytics-container');
+
 
 let sectionButtonArray = []; 
 let sectionPage = "";
@@ -51,13 +55,10 @@ setTimeout(async () => {
                 studentTableData.appendChild(createElementWithText('div', `<p>${studentsEnrolledRecord.section}</p>`, 'student-rank-container'));
                 studentTableData.appendChild(createElementWithText('div', `<p>${studentsEnrolledRecord.uid}</p>`, 'student-points-container'));
 
-                studentTableData.appendChild(createElementWithImage('div', '../Assets/Icons/delete_icon.svg', 'Delete', 'student-delete-container'));
-
                 studentTableDataContainer.appendChild(studentTableData);
             }
             
         } else {
-            console.log(assignedSections);
         }
     } catch (error) {
         console.error("Error fetching assigned sections or enrolled students:", error);
@@ -95,8 +96,6 @@ function sectionNavigationContainerHandler(sectionNavigationContainerEvent) {
             studentTableData.appendChild(createElementWithText('div', `<p>${enrolledStudentsRecords.section}</p>`, 'student-rank-container'));
             studentTableData.appendChild(createElementWithText('div', `<p>${enrolledStudentsRecords.section}</p>`, 'student-points-container'));
 
-            studentTableData.appendChild(createElementWithImage('div', '../Assets/Icons/delete_icon.svg', 'Delete', 'student-delete-container'));
-
             studentTableDataContainer.appendChild(studentTableData);
         })
     })
@@ -108,8 +107,6 @@ function studentTableDataContainerHandler(studentTableDataContainerEvent) {
     const studentNumber = studentTableDataElement.querySelector('.student-name-container'); 
 
     highestLatestModal.style.display = 'flex';
-
-    console.log("Inside student table data container handler");
 
     document.querySelector('.highest-latest-modal-close').addEventListener('click', function () {
         highestLatestModal.style.display = 'none';
@@ -126,8 +123,6 @@ function wakeHighestButton() {
 function highestButtonHandler() {
     highestPerformanceModal.style.display = 'flex';
 
-    console.log("Inside highest button handler");
-
     document.querySelector('.highest-performance-modal-close-container').addEventListener('click', function() {
         changeHighestModuleNavigationSpotlight("Module 1");
         highestPerformanceModal.style.display = 'none';
@@ -140,8 +135,6 @@ function wakeLatestButton() {
 }
 function latestButtonHandler() {
     latestPerformanceModal.style.display = 'flex';
-
-    console.log("Inside latest button handler");
 
     document.querySelector('.latest-performance-modal-close-container').addEventListener('click', function() {
         changeLatestModuleNavigationSpotlight("Module 1");
@@ -157,8 +150,6 @@ function wakeHighestPerformanceModuleNavigation() {
 function highestPerformanceModuleNavigationHandler(highestPerformanceModuleNavigationEvent) {
     let moduleName = highestPerformanceModuleNavigationEvent.target.textContent;
 
-    console.log(moduleName);
-
     changeHighestModuleNavigationSpotlight(moduleName);
 }
 
@@ -171,32 +162,62 @@ function latestPerformanceModuleNavigationHandler(latestPerformanceModuleNavigat
     changeLatestModuleNavigationSpotlight(moduleName);
 }
 const changeHighestModuleNavigationSpotlight = (moduleName) => {
-    document.querySelector('.highest-performance-module-one > p').style.setProperty('--after-background', 'transparent');
-    document.querySelector('.highest-performance-module-two > p').style.setProperty('--after-background', 'transparent');
-    document.querySelector('.highest-performance-module-three > p').style.setProperty('--after-background', 'transparent');
-
     if(moduleName == "Module 1") {
+        resetModuleSpotlight("highest");
         document.querySelector('.highest-performance-module-one > p').style.setProperty('--after-background', '#ad1f48');
     } else if(moduleName == "Module 2") {
+        resetModuleSpotlight("highest");
         document.querySelector('.highest-performance-module-two > p').style.setProperty('--after-background', '#ad1f48');
     } else if(moduleName == "Module 3") {
+        resetModuleSpotlight("highest");
         document.querySelector('.highest-performance-module-three > p').style.setProperty('--after-background', '#ad1f48');
+    } else {
+        console.log(moduleName);
     }
 }
 
 const changeLatestModuleNavigationSpotlight = (moduleName) => {
-    document.querySelector('.latest-performance-module-one > p').style.setProperty('--after-background', 'transparent');
-    document.querySelector('.latest-performance-module-two > p').style.setProperty('--after-background', 'transparent');
-    document.querySelector('.latest-performance-module-three > p').style.setProperty('--after-background', 'transparent');
-
     if(moduleName == "Module 1") {
+        resetModuleSpotlight("latest");
         document.querySelector('.latest-performance-module-one > p').style.setProperty('--after-background', '#ad1f48');
     } else if(moduleName == "Module 2") {
+        resetModuleSpotlight("latest");
         document.querySelector('.latest-performance-module-two > p').style.setProperty('--after-background', '#ad1f48');
     } else if(moduleName == "Module 3") {
+        resetModuleSpotlight("latest");
         document.querySelector('.latest-performance-module-three > p').style.setProperty('--after-background', '#ad1f48');
+    } else {
+        console.log(moduleName);
     }
 } 
+
+const resetModuleSpotlight = (from) => {
+    if(from == "latest") {
+        document.querySelector('.latest-performance-module-one > p').style.setProperty('--after-background', 'transparent');
+        document.querySelector('.latest-performance-module-two > p').style.setProperty('--after-background', 'transparent');
+        document.querySelector('.latest-performance-module-three > p').style.setProperty('--after-background', 'transparent');
+    } else {
+        document.querySelector('.highest-performance-module-one > p').style.setProperty('--after-background', 'transparent');
+        document.querySelector('.highest-performance-module-two > p').style.setProperty('--after-background', 'transparent');
+        document.querySelector('.highest-performance-module-three > p').style.setProperty('--after-background', 'transparent');
+    }
+}
+
+teacherSubheaderNavigation.addEventListener('click', teacherSubheaderNavigationHandler);
+function teacherSubheaderNavigationHandler(teacherSubheaderNavigationEvent) {
+    let theEvent = teacherSubheaderNavigationEvent.target.textContent
+    if(theEvent == "Analytics") {
+        // studentTableContainer.style.display = "none";
+        // analyticsContainer.style.display = "grid";
+        console.log(theEvent);
+    } else if(theEvent == "Students") {
+        // studentTableContainer.style.display = "grid";
+        // analyticsContainer.style.display = "none";
+        console.log(theEvent);
+    } else {
+        console.log(theEvent);
+    }
+}
 
 const createElementWithText = (tag, text, className) => {
     const element = document.createElement(tag);
